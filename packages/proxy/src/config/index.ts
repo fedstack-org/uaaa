@@ -8,7 +8,8 @@ const tAppConfig = type({
   serverAppId: 'string',
   plugins: 'string[]',
   upstream: 'string',
-  adapter: 'string'
+  adapter: 'string',
+  port: ['number', '=', 8080]
 })
 
 type IAppConfig = typeof tAppConfig.infer

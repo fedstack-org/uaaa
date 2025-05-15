@@ -4,6 +4,7 @@ export abstract class CacheImpl {
   constructor(public manager: CacheManager) {}
 
   init?(): Promise<void>
+  disconnect?(): Promise<void>
 
   abstract set(key: string, value: string, expiresIn: number): Promise<void>
   abstract get(key: string): Promise<null | string>

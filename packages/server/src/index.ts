@@ -34,6 +34,8 @@ export class App extends Hookable<{
   session
   oauth
 
+  server?: ReturnType<typeof serve>
+
   private _initialized = false
   private _stopped = false
 
@@ -70,7 +72,17 @@ export class App extends Hookable<{
     if (this._stopped) return
     logger.info(`App stopping...`)
     const start = performance.now()
+    logger.info(`Will stop http server...`)
+    await new Promise<void>((resolve) => {
+      if (!this.server) return resolve()
+      this.server.close(() => resolve())
+    })
+    logger.info(`Will disconnect db...`)
     await this.db.disconnect()
+    logger.info(`Will disconnect cache...`)
+    await this.cache.disconnect()
+    logger.info(`Will cleanup plugins...`)
+    await this.plugin.cleanupPlugins()
     const duration = performance.now() - start
     logger.info(`App stopped in ${duration.toFixed(2)}ms`)
     this._stopped = true
@@ -88,7 +100,7 @@ export class App extends Hookable<{
       .route('/oauth', oauthRouter)
       .route('/.well-known', new Hono().route('/', oauthWellKnownRouter))
     await this.callHook('extendApp', app)
-    serve({
+    this.server = serve({
       fetch: app.fetch,
       port: this.config.get('port')
     })

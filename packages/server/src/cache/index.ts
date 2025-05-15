@@ -1,7 +1,7 @@
 import { Hookable } from 'hookable'
+import type { App } from '../index.js'
 import { CacheImpl } from './_common.js'
 import { MongoCache } from './mongo.js'
-import type { App } from '../index.js'
 
 export interface CacheManager extends Omit<CacheImpl, 'init'> {}
 
@@ -24,6 +24,10 @@ export class CacheManager extends Hookable {
     this.del = this.impl.del.bind(this.impl)
     this.ttl = this.impl.ttl.bind(this.impl)
     this.clear = this.impl.clear.bind(this.impl)
+  }
+
+  async disconnect() {
+    await this.impl.disconnect?.()
   }
 }
 

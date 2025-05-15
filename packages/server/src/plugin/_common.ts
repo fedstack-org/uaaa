@@ -1,10 +1,9 @@
 import { Type, type } from 'arktype'
-import { Hono } from 'hono'
+import { Hookable } from 'hookable'
 import { readFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
-import { logger } from '../util/index.js'
-import { Hookable } from 'hookable'
 import type { App } from '../index.js'
+import { logger } from '../util/index.js'
 
 const tPluginMetadata = type({
   name: 'string',
@@ -16,8 +15,12 @@ const tPluginMetadata = type({
 
 export type IPluginMetadata = typeof tPluginMetadata.infer
 
+export interface IPluginCleanupFn {
+  (): void | Promise<void>
+}
+
 export interface IPluginSetupFn {
-  (ctx: PluginContext): void | Promise<void>
+  (ctx: PluginContext): void | IPluginCleanupFn | Promise<void | IPluginCleanupFn>
 }
 
 export interface IPlugin extends IPluginMetadata {
@@ -27,7 +30,7 @@ export interface IPlugin extends IPluginMetadata {
 
 export interface ILoadedPlugin extends IPluginMetadata {
   setup: IPluginSetupFn
-  setupPromise?: Promise<void>
+  setupPromise?: Promise<void | IPluginCleanupFn>
 }
 
 export class PluginContext {
@@ -43,6 +46,7 @@ export class PluginContext {
 
 export class PluginManager extends Hookable<{
   postSetup(): void | Promise<void>
+  postCleanup(): void | Promise<void>
 }> {
   private _resolver: NodeRequire
   plugins: Record<string, ILoadedPlugin> = Object.create(null)
@@ -123,6 +127,18 @@ export class PluginManager extends Hookable<{
     }
     await Promise.all(Object.values(this.plugins).map((plugin) => plugin.setupPromise))
     await this.callHook('postSetup')
+  }
+
+  async cleanupPlugins() {
+    for (const plugin of Object.values(this.plugins)) {
+      if (plugin.setupPromise) {
+        const cleanup = await plugin.setupPromise
+        if (cleanup) {
+          await cleanup()
+        }
+      }
+    }
+    await this.callHook('postCleanup')
   }
 
   async waitForPlugin(name: string, fail = true) {
