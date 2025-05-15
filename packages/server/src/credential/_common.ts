@@ -1,17 +1,10 @@
-import { Hookable } from 'hookable'
+import { type SecurityLevel } from '@uaaa/core'
 import type { Context } from 'hono'
-import {
-  BusinessError,
-  type App,
-  type CredentialType,
-  type ICredentialDoc,
-  type ICredentialTypeMap,
-  type SecurityLevel
-} from '../index.js'
-import { HTTPException } from 'hono/http-exception'
+import { Hookable } from 'hookable'
 import type { MatchKeysAndValues } from 'mongodb'
 import { nanoid } from 'nanoid'
 import type { ITokenDoc } from '../db/model/token.js'
+import { BusinessError, type App, type CredentialType, type ICredentialDoc } from '../index.js'
 
 export class CredentialContext {
   app

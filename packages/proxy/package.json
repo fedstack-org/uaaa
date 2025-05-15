@@ -1,5 +1,5 @@
 {
-  "name": "@uaaa/server",
+  "name": "@uaaa/proxy",
   "type": "module",
   "main": "lib/index.js",
   "version": "0.4.2",
@@ -18,34 +18,19 @@
     "lib"
   ],
   "bin": {
-    "uaaa-server": "lib/cli/index.js"
+    "uaaa-proxy": "lib/cli/index.js"
   },
   "dependencies": {
-    "@hono/arktype-validator": "^2.0.1",
-    "@hono/node-server": "^1.14.1",
-    "@simplewebauthn/server": "^13.1.1",
+    "@fastify/http-proxy": "^11.1.2",
     "@uaaa/core": "workspace:^",
     "arktype": "^2.1.20",
-    "bcrypt": "^6.0.0",
     "clipanion": "^4.0.0-rc.4",
-    "destr": "^2.0.5",
-    "hono": "^4.7.9",
-    "hookable": "^5.5.3",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.16.0",
-    "ms": "^2.1.3",
-    "nanoid": "^5.1.5",
-    "nodemailer": "^7.0.3",
+    "fastify": "^5.3.3",
+    "jose": "^6.0.11",
     "pino": "^9.6.0",
-    "totp-generator": "^1.0.0",
     "typanion": "^3.14.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/ms": "^2.1.0",
-    "@types/node": "^22.15.18",
-    "@types/nodemailer": "^6.4.17",
     "concurrently": "^9.1.2",
     "typescript": "^5.8.3"
   }

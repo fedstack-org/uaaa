@@ -1,10 +1,10 @@
+import { SECURITY_LEVEL, type SecurityLevel } from '@uaaa/core'
 import { type } from 'arktype'
-import { HTTPException } from 'hono/http-exception'
-import { nanoid } from 'nanoid'
 import ms from 'ms'
+import { nanoid } from 'nanoid'
 import { CredentialContext, CredentialImpl } from '../../../credential/_common.js'
-import { BusinessError, generateUsername, SECURITY_LEVEL } from '../../../util/index.js'
-import type { ICredentialUnbindResult, SecurityLevel } from '../../../index.js'
+import type { ICredentialUnbindResult } from '../../../index.js'
+import { BusinessError, generateUsername } from '../../../util/index.js'
 import type { EmailPlugin } from './plugin.js'
 
 export class EmailImpl extends CredentialImpl {

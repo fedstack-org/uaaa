@@ -1,9 +1,9 @@
+import { SECURITY_LEVEL } from '@uaaa/core'
 import { Hono } from 'hono'
 import { verifyAdmin, verifyAuthorizationJwt, verifyPermission } from '../_middleware.js'
-import { SECURITY_LEVEL } from '../../util/index.js'
-import { consoleUserApi } from './user.js'
 import { consoleAppApi } from './app.js'
 import { consoleSystemApi } from './system.js'
+import { consoleUserApi } from './user.js'
 
 export const consoleApi = new Hono()
   .use(verifyAuthorizationJwt)

@@ -1,12 +1,7 @@
+import { SECURITY_LEVEL, type ITokenPayload } from '@uaaa/core'
 import { createMiddleware } from 'hono/factory'
 import type jwt from 'jsonwebtoken'
-import {
-  BusinessError,
-  Permission,
-  SECURITY_LEVEL,
-  type UAAAPermissionPath
-} from '../util/index.js'
-import type { ITokenPayload } from '../token/index.js'
+import { BusinessError, Permission, type UAAAPermissionPath } from '../util/index.js'
 export { arktypeValidator } from '@hono/arktype-validator'
 
 declare module 'hono' {

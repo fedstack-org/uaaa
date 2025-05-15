@@ -1,18 +1,18 @@
-import { Hookable } from 'hookable'
-import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
-import { ConfigManager, type IConfig } from './config/index.js'
-import { DbManager } from './db/index.js'
-import { CacheManager } from './cache/index.js'
-import { PluginManager } from './plugin/index.js'
-import { CredentialManager } from './credential/index.js'
-import { TokenManager } from './token/index.js'
-import { SessionManager } from './session/index.js'
-import { ClaimManager } from './claim/index.js'
+import { Hono } from 'hono'
+import { Hookable } from 'hookable'
 import { rootApi } from './api/index.js'
-import { logger } from './util/index.js'
-import { oauthRouter, oauthWellKnownRouter } from './oauth/index.js'
+import { CacheManager } from './cache/index.js'
+import { ClaimManager } from './claim/index.js'
+import { ConfigManager, type IConfig } from './config/index.js'
+import { CredentialManager } from './credential/index.js'
+import { DbManager } from './db/index.js'
 import { OAuthManager } from './oauth/_common.js'
+import { oauthRouter, oauthWellKnownRouter } from './oauth/index.js'
+import { PluginManager } from './plugin/index.js'
+import { SessionManager } from './session/index.js'
+import { TokenManager } from './token/index.js'
+import { logger } from './util/index.js'
 
 declare module 'hono' {
   interface ContextVariableMap {
@@ -96,10 +96,11 @@ export class App extends Hookable<{
   }
 }
 
+export * from '@uaaa/core'
 export * from './api/index.js'
+export * from './claim/index.js'
 export * from './config/index.js'
 export * from './credential/index.js'
-export * from './claim/index.js'
 export * from './db/index.js'
 export * from './plugin/index.js'
 export * from './token/index.js'

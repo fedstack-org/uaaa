@@ -1,14 +1,14 @@
+import { SECURITY_LEVEL, type SecurityLevel } from '@uaaa/core'
 import { type } from 'arktype'
-import { HTTPException } from 'hono/http-exception'
 import bcrypt from 'bcrypt'
 import ms from 'ms'
-import { definePlugin } from '../../_common.js'
 import {
   CredentialContext,
   CredentialImpl,
   type ICredentialUnbindResult
 } from '../../../credential/_common.js'
-import { BusinessError, SECURITY_LEVEL, type SecurityLevel } from '../../../util/index.js'
+import { BusinessError } from '../../../util/index.js'
+import { definePlugin } from '../../_common.js'
 
 const tPasswordConfig = type({
   'passwordExpiration?': 'number|string',
@@ -46,7 +46,7 @@ class PasswordImpl extends CredentialImpl {
     if (typeof timeout === 'number') {
       return timeout
     } else {
-      return ms(timeout)
+      return ms(timeout as ms.StringValue)
     }
   }
 

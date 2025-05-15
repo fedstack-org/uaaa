@@ -4,5 +4,11 @@
     "other": "on",
     "comments": "off",
     "strings": "on"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "always",
+    "source.sortImports": "always"
   }
 }

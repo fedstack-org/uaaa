@@ -1,29 +1,12 @@
-import { createPrivateKey, createPublicKey, KeyObject } from 'node:crypto'
+import { type SecurityLevel, tTokenPayload } from '@uaaa/core'
 import { type } from 'arktype'
 import { Hookable } from 'hookable'
-import { nanoid } from 'nanoid'
 import jwt from 'jsonwebtoken'
-import { BusinessError, logger, Permission, tSecurityLevel } from '../util/index.js'
-import type { App, IAppDoc, ITokenDoc, SecurityLevel } from '../index.js'
 import ms from 'ms'
-
-export const tTokenPayload = type({
-  iss: 'string',
-  sub: 'string',
-  aud: 'string',
-  client_id: 'string',
-  sid: 'string',
-  jti: 'string',
-  perm: type('string')
-    // TODO: should be validated as scoped permission
-    .narrow((s) => s.startsWith('/'))
-    .array(),
-  level: tSecurityLevel,
-  exp: 'number',
-  iat: 'number'
-})
-
-export type ITokenPayload = typeof tTokenPayload.infer
+import { nanoid } from 'nanoid'
+import { createPrivateKey, createPublicKey, KeyObject } from 'node:crypto'
+import type { App, IAppDoc, ITokenDoc } from '../index.js'
+import { BusinessError, logger, Permission } from '../util/index.js'
 
 export interface ICreateTokenOptions {
   generateCode?: boolean
@@ -94,10 +77,10 @@ export class TokenManager extends Hookable<{}> {
   private _loadTimeouts(config: string | string[]): number[] {
     if (!Array.isArray(config)) {
       logger.warn('Token timeout set to a single value for all security levels')
-      return new Array(5).fill(ms(config))
+      return new Array(5).fill(ms(config as ms.StringValue))
     }
     if (config.length !== 5) throw new Error('Invalid config: timeout must be an array of 5 values')
-    return config.map(ms)
+    return config.map((value) => ms(value as ms.StringValue))
   }
 
   async getJWKS() {

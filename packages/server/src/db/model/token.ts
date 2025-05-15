@@ -1,4 +1,4 @@
-import type { SecurityLevel } from '../../util/index.js'
+import { type SecurityLevel } from '@uaaa/core'
 
 export interface ITokenEnvironment {
   ip?: string

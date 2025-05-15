@@ -1,5 +1,8 @@
+import { tSecurityLevel, type ITokenPayload, type SecurityLevel } from '@uaaa/core'
+import { type } from 'arktype'
 import { Hookable } from 'hookable'
-import { BusinessError, Permission, tSecurityLevel } from '../util/index.js'
+import ms from 'ms'
+import { customAlphabet, nanoid } from 'nanoid'
 import type {
   App,
   IAppDoc,
@@ -8,13 +11,9 @@ import type {
   IInstallationDoc,
   ISessionDoc,
   ITokenDoc,
-  ITokenEnvironment,
-  ITokenPayload,
-  SecurityLevel
+  ITokenEnvironment
 } from '../index.js'
-import { type } from 'arktype'
-import { customAlphabet, nanoid } from 'nanoid'
-import ms from 'ms'
+import { BusinessError, Permission } from '../util/index.js'
 
 const remoteCodeGen = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8)
 

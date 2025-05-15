@@ -1,18 +1,18 @@
+import { arktypeValidator } from '@hono/arktype-validator'
+import { generateAuthenticationOptions, generateRegistrationOptions } from '@simplewebauthn/server'
+import { SECURITY_LEVEL } from '@uaaa/core'
 import { type } from 'arktype'
+import { Hono } from 'hono'
+import ms from 'ms'
 import {
   BusinessError,
   logger,
-  SECURITY_LEVEL,
   verifyAuthorizationJwt,
   verifyPermission,
   type App,
   type PluginContext
 } from '../../../index.js'
-import { type IWebauthnKey, WebauthnImpl } from './credential.js'
-import { Hono } from 'hono'
-import ms from 'ms'
-import { generateAuthenticationOptions, generateRegistrationOptions } from '@simplewebauthn/server'
-import { arktypeValidator } from '@hono/arktype-validator'
+import { WebauthnImpl, type IWebauthnKey } from './credential.js'
 
 type IWebauthnConfigConfig = typeof WebauthnPlugin.tConfig.infer
 

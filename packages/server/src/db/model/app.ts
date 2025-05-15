@@ -1,5 +1,6 @@
+import { tSecurityLevel } from '@uaaa/core'
 import { type } from 'arktype'
-import { rAppId, tSecurityLevel } from '../../util/index.js'
+import { rAppId } from '../../util/index.js'
 
 export const tAppProvidedPermission = type({
   name: 'string',

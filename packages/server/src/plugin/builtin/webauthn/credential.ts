@@ -1,12 +1,16 @@
 import type {
+  AuthenticationResponseJSON,
   AuthenticatorTransportFuture,
-  CredentialDeviceType,
   Base64URLString,
-  PublicKeyCredentialRequestOptionsJSON,
+  CredentialDeviceType,
   PublicKeyCredentialCreationOptionsJSON,
-  RegistrationResponseJSON,
-  AuthenticationResponseJSON
+  PublicKeyCredentialRequestOptionsJSON,
+  RegistrationResponseJSON
 } from '@simplewebauthn/server'
+import { verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server'
+import { SECURITY_LEVEL, type SecurityLevel } from '@uaaa/core'
+import { type } from 'arktype'
+import ms from 'ms'
 import {
   CredentialImpl,
   type CredentialContext,
@@ -14,13 +18,8 @@ import {
   type ICredentialUnbindResult,
   type ICredentialVerifyResult
 } from '../../../credential/_common.js'
-import type { WebauthnPlugin } from './plugin.js'
-import { HTTPException } from 'hono/http-exception'
-import { verifyAuthenticationResponse, verifyRegistrationResponse } from '@simplewebauthn/server'
 import { BusinessError } from '../../../util/errors.js'
-import { type } from 'arktype'
-import ms from 'ms'
-import { SECURITY_LEVEL, type SecurityLevel } from '../../../util/index.js'
+import type { WebauthnPlugin } from './plugin.js'
 
 export interface IWebauthnKey {
   id: Base64URLString

@@ -1,18 +1,14 @@
+import { SECURITY_LEVEL, tSecurityLevel, type SecurityLevel } from '@uaaa/core'
 import { type } from 'arktype'
 import ms from 'ms'
 import { TOTP } from 'totp-generator'
-import { definePlugin } from '../../_common.js'
 import {
   CredentialContext,
   CredentialImpl,
   type ICredentialUnbindResult
 } from '../../../credential/_common.js'
-import {
-  BusinessError,
-  SECURITY_LEVEL,
-  tSecurityLevel,
-  type SecurityLevel
-} from '../../../util/index.js'
+import { BusinessError } from '../../../util/index.js'
+import { definePlugin } from '../../_common.js'
 
 const tTOTPConfig = type({
   'totpSecurityLevel?': tSecurityLevel

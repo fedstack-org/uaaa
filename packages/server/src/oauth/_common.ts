@@ -1,13 +1,14 @@
-import ms from 'ms'
-import jwt from 'jsonwebtoken'
-import { createHash } from 'node:crypto'
+import { SECURITY_LEVEL, isSecurityLevel } from '@uaaa/core'
 import { type } from 'arktype'
 import { safeDestr } from 'destr'
 import type { Context } from 'hono'
+import jwt from 'jsonwebtoken'
+import ms from 'ms'
+import { createHash } from 'node:crypto'
 import type { App, ClaimName, IAppDoc, IUserClaims } from '../index.js'
-import { OAuthError } from './_errors.js'
 import { tRemoteRequest, type RemoteRequest } from '../session/index.js'
-import { isSecurityLevel, Permission, rAppId, SECURITY_LEVEL } from '../util/index.js'
+import { Permission, rAppId } from '../util/index.js'
+import { OAuthError } from './_errors.js'
 
 export interface IOAuthTokenResponse {
   access_token: string
