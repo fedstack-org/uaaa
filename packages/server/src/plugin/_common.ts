@@ -2,6 +2,7 @@ import { Type, type } from 'arktype'
 import { Hookable } from 'hookable'
 import { readFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
+import path from 'node:path'
 import type { App } from '../index.js'
 import { logger } from '../util/index.js'
 
@@ -94,7 +95,13 @@ export class PluginManager extends Hookable<{
 
   async resolvePlugin(name: string) {
     logger.info(`Resolving plugin: ${name}`)
-    const names = [name, `@uaaa/plugin-${name}`, `./builtin/${name}/index.js`]
+    const names = [
+      // Remote Package, Local Package, Shorthand, Builtin
+      name,
+      path.resolve(name),
+      `@uaaa/plugin-${name}`,
+      `./builtin/${name}/index.js`
+    ]
     for (const name of names) {
       try {
         const path = this._resolver.resolve(name)
