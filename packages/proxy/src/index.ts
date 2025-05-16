@@ -111,3 +111,10 @@ export class App {
     this._stopped = true
   }
 }
+
+export * from '@uaaa/core'
+export * from './adapter.js'
+export * from './auth/index.js'
+export * from './config/index.js'
+export * from './plugin/index.js'
+export * from './util/index.js'
