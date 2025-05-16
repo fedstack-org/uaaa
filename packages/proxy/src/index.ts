@@ -1,19 +1,24 @@
-import { serve } from '@hono/node-server'
-import type { ITokenPayload } from '@uaaa/core'
-import { Hono } from 'hono'
-import { proxy } from 'hono/proxy'
-import type { IProxyAdapter } from './adapter.js'
+import { fastifyHttpProxy } from '@fastify/http-proxy'
+import { fastifySensible } from '@fastify/sensible'
+import { fastify, type FastifyBaseLogger, type FastifyInstance } from 'fastify'
+import type { IProxyAdapter, IProxyAdapterTransform } from './adapter.js'
 import { AuthManager } from './auth/index.js'
 import { ConfigManager, type IConfig } from './config/index.js'
 import { PluginManager } from './plugin/_common.js'
 import { logger } from './util/index.js'
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    transform: IProxyAdapterTransform
+  }
+}
 
 export class App {
   config
   plugin
   auth
 
-  server?: ReturnType<typeof serve>
+  server?: FastifyInstance
 
   private _initialized = false
   private _stopped = false
@@ -63,27 +68,34 @@ export class App {
       process.exit(1)
     }
 
-    const app = new Hono().all('/:path{.+}', async (c) => {
-      const header = c.req.header('Authorization')
-      const jwt = header?.split(' ')[1]
-      if (!jwt) {
-        return c.json({ error: 'Missing Authorization header' }, 401)
-      }
-      let token: ITokenPayload
-      try {
-        token = await this.auth.verify(jwt)
-      } catch (e) {
-        logger.info(`Token verification failed: ${e}`)
-        return c.json({ error: 'Invalid token' }, 401)
-      }
-      const req = await adapter.transformRequest(c.req.raw, token)
-      return proxy(req)
+    this.server = fastify({
+      loggerInstance: logger as FastifyBaseLogger
     })
-    this.server = serve({
-      fetch: app.fetch,
-      port: this.config.get('port')
+    this.server.decorateRequest('transform', null as never)
+    await this.server.register(fastifySensible)
+    await this.server.register(fastifyHttpProxy, {
+      preValidation: async (req, rep) => {
+        const jwt = req.headers['authorization']?.split(' ')[1]
+        if (!jwt) return rep.forbidden('No token provided')
+        try {
+          const token = await this.auth.verify(jwt)
+          const transform = await adapter.getTransform(req, rep, token)
+          req.transform = transform
+        } catch (e) {
+          logger.error(`Token verification failed: ${e}`)
+          return rep.forbidden('Invalid token')
+        }
+      },
+      upstream: this.config.get('upstream'),
+      replyOptions: {
+        rewriteRequestHeaders: (req, headers) =>
+          req.transform.rewriteRequestHeaders?.(headers) ?? headers
+      }
     })
-    logger.info(`Server listening on port ${this.config.get('port')}`)
+    await this.server.listen({
+      port: this.config.get('port'),
+      host: this.config.get('host')
+    })
   }
 
   async stop() {
@@ -91,10 +103,7 @@ export class App {
     logger.info(`App stopping...`)
     const start = performance.now()
     logger.info(`Will stop http server...`)
-    await new Promise<void>((resolve) => {
-      if (!this.server) return resolve()
-      this.server.close(() => resolve())
-    })
+    await this.server?.close()
     logger.info(`Will cleanup plugins...`)
     await this.plugin.cleanupPlugins()
     const duration = performance.now() - start

@@ -9,7 +9,8 @@ const tAppConfig = type({
   plugins: 'string[]',
   upstream: 'string',
   adapter: 'string',
-  port: ['number', '=', 8080]
+  port: ['number', '=', 8080],
+  host: ['string', '=', '0.0.0.0']
 })
 
 type IAppConfig = typeof tAppConfig.infer
@@ -32,6 +33,7 @@ export class ConfigManager extends Hookable<{
     if (result instanceof type.errors) {
       throw new Error(result.summary, { cause: result })
     }
+    this._config = result
   }
 
   async validateConfig() {
