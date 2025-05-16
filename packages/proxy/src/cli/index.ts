@@ -1,6 +1,6 @@
 #!/usr/bin/env node
+import { Builtins, Cli, Command, Option } from 'clipanion'
 import { readFile } from 'node:fs/promises'
-import { Cli, Builtins, Command, Option } from 'clipanion'
 import { App } from '../index.js'
 
 abstract class BaseCommand extends Command {
@@ -34,8 +34,8 @@ class ServeCommand extends BaseCommand {
 const [node, app, ...args] = process.argv
 
 const cli = new Cli({
-  binaryLabel: `UAAA Server`,
-  binaryName: `uaaa-server`
+  binaryLabel: `UAAA Proxy`,
+  binaryName: `uaaa-proxy`
 })
 
 cli.register(ServeCommand)

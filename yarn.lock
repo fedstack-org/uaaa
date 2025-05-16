@@ -3311,6 +3311,7 @@ __metadata:
     concurrently: "npm:^9.1.2"
     fastify: "npm:^5.3.3"
     hono: "npm:^4.7.9"
+    hookable: "npm:^5.5.3"
     jose: "npm:^6.0.11"
     pino: "npm:^9.6.0"
     typanion: "npm:^3.14.0"

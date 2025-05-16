@@ -2,7 +2,7 @@
   "name": "@uaaa/proxy",
   "type": "module",
   "main": "lib/index.js",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
@@ -29,6 +29,7 @@
     "clipanion": "^4.0.0-rc.4",
     "fastify": "^5.3.3",
     "hono": "^4.7.9",
+    "hookable": "^5.5.3",
     "jose": "^6.0.11",
     "pino": "^9.6.0",
     "typanion": "^3.14.0"
