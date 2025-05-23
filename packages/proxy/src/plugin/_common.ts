@@ -96,6 +96,7 @@ export class PluginManager extends Hookable<{
   async resolvePlugin(name: string) {
     logger.info(`Resolving plugin: ${name}`)
     const names = [
+      // Remote Package, Local Package, Shorthand, Builtin
       name,
       path.resolve(name),
       `@uaaa/plugin-proxy-${name}`,

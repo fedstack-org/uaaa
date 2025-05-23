@@ -49,7 +49,7 @@ export class PluginManager extends Hookable<{
   postSetup(): void | Promise<void>
   postCleanup(): void | Promise<void>
 }> {
-  private _resolver: NodeRequire
+  private _resolver: NodeJS.Require
   plugins: Record<string, ILoadedPlugin> = Object.create(null)
 
   constructor(public app: App) {
