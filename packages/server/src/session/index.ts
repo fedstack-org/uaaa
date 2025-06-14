@@ -139,14 +139,20 @@ export class SessionManager extends Hookable<{
     )
     const result: string[] = []
     for (const [appId, perms] of permissions) {
-      const app = await this.app.db.apps.findOne({ _id: appId, disabled: { $ne: true } })
-      for (const { perm, required } of perms) {
-        if (app) {
+      if (appId === this.app.appId) {
+        for (const { perm } of perms) {
           result.push(perm)
-        } else if (required) {
-          throw new BusinessError('BAD_REQUEST', {
-            msg: `Required permission ${perm} cannot be granted`
-          })
+        }
+      } else {
+        const app = await this.app.db.apps.findOne({ _id: appId, disabled: { $ne: true } })
+        for (const { perm, required } of perms) {
+          if (app) {
+            result.push(perm)
+          } else if (required) {
+            throw new BusinessError('BAD_REQUEST', {
+              msg: `Required permission ${perm} cannot be granted`
+            })
+          }
         }
       }
     }
