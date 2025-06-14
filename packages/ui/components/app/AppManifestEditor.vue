@@ -8,7 +8,8 @@
       <VTab :value="4" text="Requested Claims" />
       <VTab :value="5" text="Variables" />
       <VTab :value="6" text="Secrets" />
-      <VTab :value="7" text="Misc" />
+      <VTab :value="7" text="Delegation" />
+      <VTab :value="8" text="Misc" />
     </VTabs>
     <VDivider vertical />
     <VTabsWindow v-model="tab" class="flex-1">
@@ -34,6 +35,9 @@
         <AppManifestSecret v-model="manifest" />
       </VTabsWindowItem>
       <VTabsWindowItem :value="7">
+        <AppManifestDelegation v-model="manifest" />
+      </VTabsWindowItem>
+      <VTabsWindowItem :value="8">
         <AppManifestMisc v-model="manifest" />
       </VTabsWindowItem>
     </VTabsWindow>
@@ -42,7 +46,7 @@
 
 <script setup lang="ts">
 import type { IAppManifest } from '@uaaa/server'
-import { parseJSON5, parseJSONC, parseYAML, parseTOML } from 'confbox'
+import { parseJSON5, parseJSONC, parseTOML, parseYAML } from 'confbox'
 
 const manifest = defineModel<IAppManifest>({ required: true })
 
