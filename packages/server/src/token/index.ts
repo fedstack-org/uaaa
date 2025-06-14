@@ -6,7 +6,7 @@ import ms from 'ms'
 import { nanoid } from 'nanoid'
 import { createPrivateKey, createPublicKey, KeyObject } from 'node:crypto'
 import type { App, IAppDoc, ITokenDoc } from '../index.js'
-import { BusinessError, logger, Permission } from '../util/index.js'
+import { BusinessError, logger, Permission, safeCompare } from '../util/index.js'
 
 export interface ICreateTokenOptions {
   generateCode?: boolean
@@ -305,7 +305,7 @@ export class TokenManager extends Hookable<{}> {
         { _id: client.id },
         { projection: { secret: 1 } }
       )
-      if (!clientApp || clientApp.secret !== client.secret) {
+      if (!clientApp || !client.secret || !safeCompare(clientApp.secret, client.secret)) {
         throw new BusinessError('TOKEN_INVALID_CLIENT', {})
       }
     }

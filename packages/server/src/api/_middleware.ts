@@ -1,14 +1,15 @@
 import { SECURITY_LEVEL, type ITokenPayload } from '@uaaa/core'
 import { createMiddleware } from 'hono/factory'
 import type jwt from 'jsonwebtoken'
-import { BusinessError, Permission, type UAAAPermissionPath } from '../util/index.js'
+import { BusinessError, Permission, type UAAA, type UAAAPermissionPath } from '../util/index.js'
 export { arktypeValidator } from '@hono/arktype-validator'
 
 declare module 'hono' {
   interface ContextVariableMap {
     jwt: jwt.Jwt
     token: ITokenPayload
-    matchedPermissions: Permission[]
+    matchedPermissions: Permission<UAAA>[]
+    matchedCapabilities?: Permission<UAAA>[]
   }
 }
 
@@ -27,8 +28,24 @@ export const verifyAuthorizationJwt = createMiddleware(async (ctx, next) => {
 })
 
 export interface IVerifyPermissionOptions {
-  path?: UAAAPermissionPath
-  securityLevel?: number
+  path?: UAAAPermissionPath | undefined
+  securityLevel?: number | undefined
+}
+
+const matchPermissions = <K extends string>(
+  path: string,
+  scopedPermissions: string[],
+  appId: K
+) => {
+  const matched = scopedPermissions
+    .map((p) => Permission.fromScopedString(p, appId))
+    .filter((p) => p.test(path))
+  if (!matched.length) {
+    throw new BusinessError('INSUFFICIENT_PERMISSION', {
+      required: [path]
+    })
+  }
+  return matched
 }
 
 export const verifyPermission = ({
@@ -42,14 +59,7 @@ export const verifyPermission = ({
       })
     }
     if (path !== undefined) {
-      const matchedPermissions = ctx.var.token.perm
-        .map((p) => Permission.fromScopedString(p, ctx.var.app.appId))
-        .filter((p) => p.test(path))
-      if (!matchedPermissions.length) {
-        throw new BusinessError('INSUFFICIENT_PERMISSION', {
-          required: [path]
-        })
-      }
+      const matchedPermissions = matchPermissions(path, ctx.var.token.perm, ctx.var.app.appId)
       ctx.set('matchedPermissions', matchedPermissions)
     }
     await next()
@@ -66,3 +76,30 @@ export const verifyAdmin = createMiddleware(async (ctx, next) => {
   }
   await next()
 })
+
+export const verifyCapability = ({
+  path,
+  securityLevel = SECURITY_LEVEL.LOW
+}: IVerifyPermissionOptions) =>
+  createMiddleware(async (ctx, next) => {
+    if (ctx.var.token.level < securityLevel) {
+      throw new BusinessError('INSUFFICIENT_SECURITY_LEVEL', {
+        required: securityLevel
+      })
+    }
+    if (path !== undefined) {
+      const matchedPermissions = matchPermissions(path, ctx.var.token.perm, ctx.var.app.appId)
+      const user = await ctx.var.app.db.users.findOne(
+        { _id: ctx.var.token.sub },
+        { projection: { 'claims.capabilities': 1 } }
+      )
+      if (!user || !user.claims.capabilities?.verified) {
+        throw new BusinessError('FORBIDDEN', { msg: 'Missing capabilities' })
+      }
+      const capabilities = user.claims.capabilities.value.split(',')
+      const matchedCapabilities = matchPermissions(path, capabilities, ctx.var.app.appId)
+      ctx.set('matchedPermissions', matchedPermissions)
+      ctx.set('matchedCapabilities', matchedCapabilities)
+    }
+    await next()
+  })

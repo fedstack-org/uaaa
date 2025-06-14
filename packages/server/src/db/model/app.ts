@@ -45,6 +45,12 @@ export const tChangelogItem = type({
   content: 'string'
 })
 
+export const tDelegationConfig = type({
+  userId: 'string',
+  requestedPermissions: tAppRequestedPermission.array()
+})
+export type IAppDelegationConfig = typeof tDelegationConfig.infer
+
 export const tAppManifest = type({
   appId: type('string').narrow((id) => rAppId.test(id)),
   name: 'string',
@@ -60,6 +66,7 @@ export const tAppManifest = type({
   changelog: tChangelogItem.array(),
   'config?': tAppGeneralConfig,
   'openid?': tAppOpenIdConfig,
+  'delegation?': tDelegationConfig,
   securityLevel: tSecurityLevel
 }).narrow((manifest) => manifest.version === manifest.changelog.length)
 

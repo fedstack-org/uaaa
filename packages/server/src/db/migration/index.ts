@@ -1,11 +1,11 @@
-import { generateKeyPair } from 'node:crypto'
-import { promisify } from 'node:util'
 import { Hookable } from 'hookable'
 import { MongoServerError } from 'mongodb'
-import type { DbManager } from '../index.js'
+import { generateKeyPair } from 'node:crypto'
+import { promisify } from 'node:util'
 import { logger, wait } from '../../util/index.js'
+import type { DbManager } from '../index.js'
 
-export const databaseVersion = 2
+export const databaseVersion = 3
 
 export interface IMigrationImpl {
   (this: MigrationManager): Promise<void>
@@ -54,7 +54,7 @@ export class MigrationManager extends Hookable<{
     })
 
     this.migrations.set(1, async function () {
-      // Since UAAA v1.0.0
+      // Since UAAA v0.1.0
       // Token Document is changed, delete all of old items
       await this.db.tokens.deleteMany({})
       // Also Session Document is changed
@@ -65,6 +65,16 @@ export class MigrationManager extends Hookable<{
       await this.db.installations.updateMany({}, { $set: { version: 0 } })
 
       await this.db.setSystemConfig('version', 2)
+    })
+
+    this.migrations.set(2, async function () {
+      // Add delegated session
+      await this.db.sessions.createIndex(
+        { appId: 1, userId: 1 },
+        { unique: true, partialFilterExpression: { appId: { $exists: true } } }
+      )
+
+      await this.db.setSystemConfig('version', 3)
     })
   }
 

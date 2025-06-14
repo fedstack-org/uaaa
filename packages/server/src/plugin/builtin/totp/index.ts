@@ -7,7 +7,7 @@ import {
   CredentialImpl,
   type ICredentialUnbindResult
 } from '../../../credential/_common.js'
-import { BusinessError } from '../../../util/index.js'
+import { BusinessError, safeCompare } from '../../../util/index.js'
 import { definePlugin } from '../../_common.js'
 
 const tTOTPConfig = type({
@@ -79,7 +79,8 @@ class TOTPImpl extends CredentialImpl {
       throw new BusinessError('NOT_FOUND', { msg: 'TOTP credential not found' })
     }
 
-    if (payload.code !== TOTP.generate(credential.secret as string).otp) {
+    const { otp } = TOTP.generate(credential.secret as string)
+    if (!safeCompare(payload.code, otp)) {
       throw new BusinessError('FORBIDDEN', { msg: 'Invalid TOTP code' })
     }
 
@@ -101,7 +102,8 @@ class TOTPImpl extends CredentialImpl {
       throw new BusinessError('INVALID_TYPE', { summary: payload.summary })
     }
 
-    if (payload.code !== TOTP.generate(payload.secret).otp) {
+    const { otp } = TOTP.generate(payload.secret)
+    if (!safeCompare(payload.code, otp)) {
       throw new BusinessError('BAD_REQUEST', { msg: 'Invalid TOTP code' })
     }
 

@@ -1,16 +1,18 @@
 import { Hono } from 'hono'
-import { sessionApi } from './session/index.js'
-import { userApi } from './user/index.js'
-import { consoleApi } from './console/index.js'
-import { publicApi } from './public/index.js'
 import { HTTPException } from 'hono/http-exception'
 import { MongoServerError } from 'mongodb'
 import { BusinessError } from '../util/errors.js'
+import { consoleApi } from './console/index.js'
+import { manageApi } from './manage/index.js'
+import { publicApi } from './public/index.js'
+import { sessionApi } from './session/index.js'
+import { userApi } from './user/index.js'
 
 export const rootApi = new Hono()
   .route('/public', publicApi)
   .route('/session', sessionApi)
   .route('/user', userApi)
+  .route('/manage', manageApi)
   .route('/console', consoleApi)
   .onError((err, ctx) => {
     if (err instanceof HTTPException) return err.getResponse()
@@ -26,9 +28,10 @@ export const rootApi = new Hono()
 export type IRootApi = typeof rootApi
 
 export * from './_common.js'
-export * from './_middleware.js'
 export * from './_helper.js'
+export * from './_middleware.js'
 export * from './console/index.js'
+export * from './manage/index.js'
 export * from './public/index.js'
 export * from './session/index.js'
 export * from './user/index.js'

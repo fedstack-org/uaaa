@@ -1,4 +1,4 @@
-import { SECURITY_LEVEL, type SecurityLevel } from '@uaaa/core'
+import { rePermissionPathMatcher, SECURITY_LEVEL, type SecurityLevel } from '@uaaa/core'
 import type { Context } from 'hono'
 import { Hookable } from 'hookable'
 import type { App, IAppRequestedClaim, IUserClaims } from '../index.js'
@@ -13,6 +13,7 @@ export interface IClaimNames {
   email?: string | undefined
   phone?: string | undefined
   is_admin?: string | undefined
+  capabilities?: string | undefined
 }
 
 export type ClaimName = keyof IClaimNames
@@ -214,6 +215,18 @@ export class ClaimManager extends Hookable<{
       description: 'Is admin',
       securityLevel: SECURITY_LEVEL.MAX,
       basic: true
+    })
+
+    this.addClaimDescriptor({
+      name: 'capabilities',
+      description: 'Capabilities',
+      securityLevel: SECURITY_LEVEL.HIGH,
+      basic: true
+    })
+    this.hook('validate:capabilities', async (ctx: ClaimContext, value: string) => {
+      if (!value.split(',').every((matcher) => rePermissionPathMatcher.test(matcher))) {
+        throw new BusinessError('BAD_REQUEST', { msg: `Invalid capabilities` })
+      }
     })
   }
 }

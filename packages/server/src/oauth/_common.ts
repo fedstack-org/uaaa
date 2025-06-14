@@ -7,7 +7,7 @@ import ms from 'ms'
 import { createHash } from 'node:crypto'
 import type { App, ClaimName, IAppDoc, IUserClaims } from '../index.js'
 import { tRemoteRequest, type RemoteRequest } from '../session/index.js'
-import { Permission, rAppId } from '../util/index.js'
+import { Permission, rAppId, safeCompare } from '../util/index.js'
 import { OAuthError } from './_errors.js'
 
 export interface IOAuthTokenResponse {
@@ -90,7 +90,7 @@ export class OAuthManager {
         }
 
         if (tokenDoc.confidential) {
-          if (client.app.secret !== client.secret) {
+          if (!safeCompare(client.app.secret, client.secret)) {
             throw new OAuthError('invalid_client')
           }
           // For confidential clients, PKCE is optional
@@ -197,7 +197,7 @@ export class OAuthManager {
         }
 
         if (tokenDoc.confidential) {
-          if (client.app.secret !== client.secret) {
+          if (!safeCompare(client.app.secret, client.secret)) {
             throw new OAuthError('invalid_client')
           }
         }
@@ -445,7 +445,7 @@ export class OAuthManager {
       const [_id, _secret = ''] = Buffer.from(token, 'base64').toString().split(':')
       clientId ??= _id
       clientSecret ??= _secret
-      if (clientId !== _id || clientSecret !== _secret) {
+      if (clientId !== _id || !safeCompare(clientSecret, _secret)) {
         throw new OAuthError('invalid_client')
       }
       return { clientId, clientSecret }

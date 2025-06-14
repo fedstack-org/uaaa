@@ -59,6 +59,10 @@ export interface ICredentialBindResult {
 
 export interface ICredentialUnbindResult {}
 
+export interface ICredentialEnsureResult {
+  userId: string
+}
+
 export abstract class CredentialImpl {
   abstract get type(): CredentialType
 
@@ -110,6 +114,8 @@ export abstract class CredentialImpl {
     credentialId: string,
     payload: unknown
   ): Promise<ICredentialUnbindResult>
+
+  ensure?(ctx: CredentialContext, payload: unknown): Promise<ICredentialEnsureResult>
 }
 
 export class CredentialManager extends Hookable<{}> {
@@ -204,6 +210,14 @@ export class CredentialManager extends Hookable<{}> {
       throw new Error('Credential type not found')
     }
     return impl.unbind(new CredentialContext(this, ctx), userId, credentialId, payload)
+  }
+
+  async handleEnsure(ctx: Context, type: string, payload: unknown) {
+    const impl = this.impls[type]
+    if (!impl || !impl.ensure) {
+      throw new Error('Credential type not found')
+    }
+    return impl.ensure(new CredentialContext(this, ctx), payload)
   }
 
   async checkCredentialUse(credentialId: string, set: MatchKeysAndValues<ICredentialDoc> = {}) {

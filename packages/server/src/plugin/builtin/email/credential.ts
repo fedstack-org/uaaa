@@ -3,7 +3,7 @@ import { type } from 'arktype'
 import ms from 'ms'
 import { nanoid } from 'nanoid'
 import { CredentialContext, CredentialImpl } from '../../../credential/_common.js'
-import type { ICredentialUnbindResult } from '../../../index.js'
+import type { ICredentialEnsureResult, ICredentialUnbindResult } from '../../../index.js'
 import { BusinessError, generateUsername } from '../../../util/index.js'
 import type { EmailPlugin } from './plugin.js'
 
@@ -11,6 +11,9 @@ export class EmailImpl extends CredentialImpl {
   static readonly tPayload = type({
     email: 'string',
     code: 'string'
+  })
+  static readonly tEnsurePayload = type({
+    email: 'string'
   })
 
   readonly type = 'email'
@@ -180,5 +183,50 @@ export class EmailImpl extends CredentialImpl {
     )
     await ctx.manager.unbindCredential(ctx, 'email', userId, credentialId)
     return {}
+  }
+
+  override async ensure(
+    ctx: CredentialContext,
+    payload: unknown
+  ): Promise<ICredentialEnsureResult> {
+    const checked = EmailImpl.tEnsurePayload(payload)
+    if (checked instanceof type.errors) {
+      throw new BusinessError('BAD_REQUEST', { msg: checked.summary })
+    }
+    const { email } = checked
+    const credential = await ctx.app.db.credentials.findOne({
+      data: email,
+      type: 'email',
+      disabled: { $ne: true }
+    })
+    if (credential) {
+      return { userId: credential.userId }
+    }
+    const now = Date.now()
+    const { insertedId: userId } = await ctx.app.db.users.insertOne({
+      _id: nanoid(),
+      claims: {
+        username: { value: generateUsername(email.split('@')[0]) },
+        email: { value: email, verified: true }
+      },
+      salt: nanoid()
+    })
+    await ctx.app.db.credentials.insertOne({
+      _id: nanoid(),
+      globalIdentifier: email,
+      userIdentifier: '',
+      userId: userId,
+      type: 'email',
+      data: email,
+      secret: '',
+      remark: '',
+      validAfter: now,
+      validBefore: now + ms('100y'),
+      validCount: Number.MAX_SAFE_INTEGER,
+      createdAt: now,
+      updatedAt: now,
+      securityLevel: this.defaultLevel
+    })
+    return { userId }
   }
 }

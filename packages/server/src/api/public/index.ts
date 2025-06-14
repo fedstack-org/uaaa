@@ -1,12 +1,18 @@
-import { Hono } from 'hono'
 import { arktypeValidator } from '@hono/arktype-validator'
 import { type } from 'arktype'
-import { idParamValidator } from '../_common.js'
+import { Hono } from 'hono'
 import type { IAppDoc } from '../../db/index.js'
-import { BusinessError } from '../../util/errors.js'
-import { getRemoteIP, getUserAgent } from '../_helper.js'
-import { UAAAProvidedPermissions } from '../../util/permission.js'
 import { tExchangeOptions, tRemoteRequest } from '../../session/index.js'
+import { BusinessError } from '../../util/errors.js'
+import { IncludeProjection } from '../../util/index.js'
+import { UAAAProvidedPermissions } from '../../util/permission.js'
+import { idParamValidator } from '../_common.js'
+import { getRemoteIP, getUserAgent } from '../_helper.js'
+
+const appListProjection = new IncludeProjection<IAppDoc>() //
+  .with('_id', 'name', 'version', 'description', 'icon', 'variables', 'securityLevel')
+const appDocProjection = appListProjection //
+  .with('providedPermissions', 'requestedClaims', 'requestedPermissions', 'changelog')
 
 /** Public API */
 export const publicApi = new Hono()
@@ -20,23 +26,17 @@ export const publicApi = new Hono()
   })
   // List promoted applications
   .get('/app', async (ctx) => {
-    const apps: Array<null | Omit<IAppDoc, 'secret' | 'secrets' | 'callbackUrls'>> =
+    const apps: Array<typeof appListProjection.infer> = //
       await ctx.var.app.db.apps
-        .find(
-          { 'config.promoted': true },
-          { projection: { secret: 0, secrets: 0, callbackUrls: 0 } }
-        )
+        .find({ 'config.promoted': true }, { projection: appListProjection.build() })
         .toArray()
     return ctx.json({ apps })
   })
   // Get Application info
   .get('/app/:id', idParamValidator, async (ctx) => {
     const { id } = ctx.req.valid('param')
-    const app: null | Omit<IAppDoc, 'secret' | 'secrets' | 'config' | 'openid' | 'callbackUrls'> =
-      await ctx.var.app.db.apps.findOne(
-        { _id: id },
-        { projection: { secret: 0, secrets: 0, config: 0, openid: 0, callbackUrls: 0 } }
-      )
+    const app: null | typeof appDocProjection.infer = //
+      await ctx.var.app.db.apps.findOne({ _id: id }, { projection: appDocProjection.build() })
     if (!app) {
       throw new BusinessError('NOT_FOUND', { msg: 'App not found' })
     }
@@ -93,13 +93,7 @@ export const publicApi = new Hono()
   // Login
   .post(
     '/login',
-    arktypeValidator(
-      'json',
-      type({
-        type: 'string',
-        payload: 'unknown'
-      })
-    ),
+    arktypeValidator('json', type({ type: 'string', payload: 'unknown' })),
     async (ctx) => {
       const { type, payload } = ctx.req.valid('json')
       const { credential, session } = ctx.var.app
@@ -114,13 +108,7 @@ export const publicApi = new Hono()
   // Exchange
   .post(
     '/exchange',
-    arktypeValidator(
-      'json',
-      type({
-        from: 'string',
-        config: tExchangeOptions
-      })
-    ),
+    arktypeValidator('json', type({ from: 'string', config: tExchangeOptions })),
     async (ctx) => {
       const { app } = ctx.var
       const { from, config } = ctx.req.valid('json')
@@ -171,6 +159,16 @@ export const publicApi = new Hono()
       const { userCode, authCode, request } = ctx.req.valid('json')
       const response = await ctx.var.app.session.remoteAppPoll(userCode, authCode, request)
       return ctx.json({ response })
+    }
+  )
+  // Delegated session
+  .post(
+    '/delegate',
+    arktypeValidator('json', type({ clientAppId: 'string', clientAppSecret: 'string' })),
+    async (ctx) => {
+      const { session } = ctx.var.app
+      const { clientAppId, clientAppSecret } = ctx.req.valid('json')
+      return ctx.json(await session.delegate(clientAppId, clientAppSecret))
     }
   )
 

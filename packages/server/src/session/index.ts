@@ -6,6 +6,7 @@ import { customAlphabet, nanoid } from 'nanoid'
 import type {
   App,
   IAppDoc,
+  IAppRequestedPermission,
   ICredentialLoginResult,
   ICredentialVerifyResult,
   IInstallationDoc,
@@ -13,7 +14,7 @@ import type {
   ITokenDoc,
   ITokenEnvironment
 } from '../index.js'
-import { BusinessError, Permission } from '../util/index.js'
+import { BusinessError, Permission, safeCompare } from '../util/index.js'
 
 const remoteCodeGen = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8)
 
@@ -131,6 +132,27 @@ export class SessionManager extends Hookable<{
     return app
   }
 
+  async _checkPermissions(requested: IAppRequestedPermission[]): Promise<string[]> {
+    const permissions = Map.groupBy(
+      requested.map((req) => ({ ...req, parsed: Permission.fromCompactString(req.perm) })),
+      (item) => item.parsed.appId
+    )
+    const result: string[] = []
+    for (const [appId, perms] of permissions) {
+      const app = await this.app.db.apps.findOne({ _id: appId, disabled: { $ne: true } })
+      for (const { perm, required } of perms) {
+        if (app) {
+          result.push(perm)
+        } else if (required) {
+          throw new BusinessError('BAD_REQUEST', {
+            msg: `Required permission ${perm} cannot be granted`
+          })
+        }
+      }
+    }
+    return result
+  }
+
   async _resolvePermissions(
     app: IAppDoc,
     installation: IInstallationDoc,
@@ -189,6 +211,56 @@ export class SessionManager extends Hookable<{
         jwtTimeout: token.getJwtTimeout(securityLevel, tokenTimeout),
         refreshTimeout: token.getRefreshTimeout(securityLevel, refreshTimeout),
         environment
+      },
+      { timestamp: now }
+    )
+  }
+
+  /**
+   * Delegated session by application
+   *
+   * @returns The created token
+   */
+  async delegate(appId: string, appSecret: string) {
+    const app = await this._getAppOrFail(appId)
+    if (!safeCompare(app.secret, appSecret)) {
+      throw new BusinessError('BAD_REQUEST', { msg: 'Invalid app secret' })
+    }
+    if (!app.delegation) {
+      throw new BusinessError('BAD_REQUEST', { msg: 'App does not support delegation' })
+    }
+    const { userId, requestedPermissions } = app.delegation
+    await this._checkUser(userId)
+    const permissions = await this._checkPermissions(requestedPermissions)
+    const now = Date.now()
+    const session = await this.app.db.sessions.findOneAndUpdate(
+      { appId, userId, terminated: { $ne: true } },
+      {
+        $set: { expiresAt: now },
+        $setOnInsert: { _id: nanoid(), createdAt: now, environment: {} },
+        $addToSet: { authorizedApps: appId }
+      },
+      { returnDocument: 'after', upsert: true }
+    )
+    if (!session) {
+      throw new BusinessError('BAD_REQUEST', { msg: 'Delegated session not found or terminated' })
+    }
+    const securityLevel = app.securityLevel
+    return this.app.token.createAndSignToken(
+      {
+        sessionId: session._id,
+        userId,
+        appId,
+        permissions,
+        securityLevel,
+        createdAt: now,
+        updatedAt: now,
+        activatedAt: now,
+        expiresAt: now + this.app.token.getTokenTimeout(securityLevel),
+        jwtTimeout: this.app.token.getJwtTimeout(securityLevel),
+        refreshTimeout: this.app.token.getRefreshTimeout(securityLevel),
+        confidential: true,
+        environment: {}
       },
       { timestamp: now }
     )
