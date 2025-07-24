@@ -1,14 +1,14 @@
 import type {
+  ErrorName,
+  IClaim,
+  IConsoleApi,
+  IErrorMap,
   IPublicApi,
   ISessionApi,
-  IUserApi,
-  IConsoleApi,
   ITokenPayload,
-  IClaim,
-  ErrorName,
-  IErrorMap,
-  SecurityLevel,
-  IUserClaims
+  IUserApi,
+  IUserClaims,
+  SecurityLevel
 } from '@uaaa/server'
 import type { IEmailApi } from '@uaaa/server/lib/plugin/builtin/email'
 import type { IWebauthnApi } from '@uaaa/server/lib/plugin/builtin/webauthn'
@@ -125,7 +125,7 @@ export class ApiManager {
         return
       } catch (err) {
         if (isAPIError(err) && err.code === 'TOKEN_INVALID_REFRESH') {
-          delete this.tokens.value[level].refreshToken
+          delete this.tokens.value[level]!.refreshToken
           console.log(`[API] Token ${level} failed to refresh: invalid refreshToken`)
         } else {
           console.log(`[API] Token ${level} failed to refresh: ${this._formatError(err)}`)
@@ -273,7 +273,7 @@ export class ApiManager {
   }
 
   static parseJwt(token: string) {
-    return JSON.parse(atob(token.split('.')[1])) as ITokenPayload
+    return JSON.parse(atob(token.split('.')[1] || '')) as ITokenPayload
   }
 }
 

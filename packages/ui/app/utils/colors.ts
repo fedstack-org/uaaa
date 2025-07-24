@@ -17,7 +17,7 @@ function hexToRGBArray(color: string) {
     parseInt(color.slice(0, 2), 16),
     parseInt(color.slice(2, 4), 16),
     parseInt(color.slice(4, 6), 16)
-  ]
+  ] as const
 }
 
 // See: https://stackoverflow.com/a/16348977

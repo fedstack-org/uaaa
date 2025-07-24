@@ -4,7 +4,7 @@
       <VListItem v-for="(link, i) of links" :key="i" v-bind="link" :title="t(link.title)" />
       <VListGroup v-if="isAdmin" value="Admin">
         <template v-slot:activator="{ props }">
-          <VListItem v-bind="{ ...props, ...adminLinks[0] }" :title="t(adminLinks[0].title)" />
+          <VListItem v-bind="{ ...props, ...adminLinks[0] }" :title="t(adminLinks[0]!.title)" />
         </template>
         <VListItem
           v-for="(link, i) of adminLinks.slice(1)"
@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { version } from '~/package.json'
+import { version } from '@@/package.json'
 
 const model = defineModel<boolean>()
 

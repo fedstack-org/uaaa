@@ -5,6 +5,7 @@ export interface IUIConfig {
 
 const _useUIConfig = () => {
   return useAsyncData(
+    'ui-config-data',
     async () => {
       const resp = await fetch('/ui_config.json')
       if (!resp.ok) {

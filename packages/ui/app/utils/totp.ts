@@ -10,7 +10,7 @@ export function generateTOTPSecret(length = 20) {
     let bufferSize = 0
 
     for (let j = 0; j < 5 && i + j < randomBytes.length; j++) {
-      buffer = (buffer << 8) | randomBytes[i + j]
+      buffer = (buffer << 8) | randomBytes[i + j]!
       bufferSize += 8
     }
 

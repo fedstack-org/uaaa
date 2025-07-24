@@ -21,8 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import uaaa from '@/public/logo.svg'
-
 const props = defineProps<{
   appId: string
   icon?: string
@@ -30,7 +28,7 @@ const props = defineProps<{
 }>()
 
 const { data } = await useAsyncData(props.appId, async () => {
-  if (props.appId === api.appId.value) return { name: 'UAAA', icon: uaaa }
+  if (props.appId === api.appId.value) return { name: 'UAAA', icon: '/logo.svg' }
   if (props.icon) return { icon: props.icon, name: props.name ?? '' }
   if (props.name) return { name: props.name }
   const resp = await api.public.app[':id'].$get({ param: { id: props.appId } })
@@ -40,8 +38,8 @@ const { data } = await useAsyncData(props.appId, async () => {
 })
 
 const generateTitle = (name: string) => {
-  const [first, second] = name.split(/\s+/)
-  const code = (first[0] + (second ? second[0] : (first[1] ?? ''))).toUpperCase()
+  const [first, second] = name.split(/\s+/) as [string, string?]
+  const code = (first[0]! + (second ? second[0]! : (first[1]! ?? ''))).toUpperCase()
   if (/[^\x01-\x7E]/.test(code)) return code[0]
   return code
 }

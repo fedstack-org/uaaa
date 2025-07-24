@@ -31,7 +31,7 @@ export const useIAAA = () => {
     } else {
       localStorage.setItem('authRedirect', route.fullPath)
       document.write(html)
-      document.forms[0].submit()
+      document.forms[0]!.submit()
       await sleep(2000)
       return ''
     }
@@ -58,7 +58,7 @@ export const useIAAA = () => {
         : new URL(redirectUrl).origin === window.location.origin
     if (sameOrigin) {
       client.document.write(html)
-      client.document.forms[0].submit()
+      client.document.forms[0]!.submit()
       const start = Date.now()
       for (; !client.closed && Date.now() - start < timeout; ) {
         try {
