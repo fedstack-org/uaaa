@@ -33,9 +33,13 @@
         </div>
       </VCardTitle>
       <VDivider />
-      <VAlert type="info" rounded="0" variant="tonal" class="whitespace-pre">
+      <VAlert type="info" rounded="0" variant="tonal" class="whitespace-pre-line">
         {{ t('msg.login-hint') }}
       </VAlert>
+      <template v-if="uiConfig.signInNotice">
+        <VDivider />
+        <VAlert type="warning" rounded="0" variant="tonal" :text="uiConfig.signInNotice" />
+      </template>
       <VDivider />
       <VFadeTransition mode="out-in">
         <template v-if="isRemote">
@@ -140,4 +144,6 @@ const {
 } = useRemoteAuthorize()
 
 const deviceUrl = new URL('/remote', location.href)
+
+const { data: uiConfig } = useUIConfig()
 </script>

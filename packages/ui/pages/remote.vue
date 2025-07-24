@@ -8,11 +8,9 @@
         <div>{{ t('pages.remote-authorize') }}</div>
       </VCardTitle>
       <VCardText>
-        <VAlert
-          type="warning"
-          :text="t('msg.remote-warn', { code: userCode })"
-          class="whitespace-pre"
-        />
+        <VAlert type="warning" class="whitespace-pre-line">
+          {{ t('msg.remote-warn', { code: userCode }) }}
+        </VAlert>
       </VCardText>
       <VDivider />
       <div class="flex justify-center items-center uppercase!">

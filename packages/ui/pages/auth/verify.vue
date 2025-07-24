@@ -17,7 +17,7 @@
       </VCardTitle>
       <VDivider />
       <template v-if="data?.length">
-        <VAlert type="info" rounded="0" variant="tonal" class="whitespace-pre">
+        <VAlert type="info" rounded="0" variant="tonal" class="whitespace-pre-line">
           {{
             t('msg.verify-hint', {
               currentLevel: t(`securityLevel.${currentLevel}`),
@@ -26,6 +26,10 @@
           }}
         </VAlert>
         <VDivider />
+      </template>
+      <template v-if="uiConfig.verifyNotice">
+        <VDivider />
+        <VAlert type="warning" rounded="0" variant="tonal" :text="uiConfig.verifyNotice" />
       </template>
       <VFadeTransition mode="out-in">
         <div v-if="!type">
@@ -40,13 +44,10 @@
               @click="type = item"
             />
           </VCardText>
-          <VAlert
-            v-else
-            type="info"
-            variant="tonal"
-            class="whitespace-pre"
-            :title="t('msg.no-verify-methods')"
-          >
+          <VAlert v-else type="info" variant="tonal" class="whitespace-pre-line">
+            <template #title>
+              {{ t('msg.no-verify-methods') }}
+            </template>
             {{ t('msg.no-verify-methods-hint') }}
             <VSpacer />
             <VBtn
@@ -131,4 +132,6 @@ watch(
     }
   }
 )
+
+const { data: uiConfig } = useUIConfig()
 </script>

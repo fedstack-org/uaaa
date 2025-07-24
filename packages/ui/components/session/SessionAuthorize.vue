@@ -11,12 +11,9 @@
       </VListItem>
     </VList>
     <VCardText>
-      <VAlert
-        v-if="params.userCode"
-        type="warning"
-        :text="t('msg.remote-warn', { code: params.userCode })"
-        class="whitespace-pre"
-      />
+      <VAlert v-if="params.userCode" type="warning" class="whitespace-pre-line">
+        {{ t('msg.remote-warn', { code: params.userCode }) }}
+      </VAlert>
       <VAlert v-else :text="t('msg.authorize-warn')" />
     </VCardText>
     <AppGrantEditor v-if="showGrant" :app="app" readonly />
