@@ -11,6 +11,10 @@ export abstract class CacheImpl {
   abstract del(key: string): Promise<void>
   abstract ttl(key: string): Promise<number>
   abstract clear(): Promise<void>
+  abstract setn(key: string, value: number, expiresIn: number): Promise<void>
+  abstract getn(key: string): Promise<number>
+  abstract incr(key: string, amount: number, expiresIn: number): Promise<number>
+  abstract expire(key: string, timeout: number): Promise<void>
 
   async gete(key: string): Promise<string> {
     const value = await this.get(key)

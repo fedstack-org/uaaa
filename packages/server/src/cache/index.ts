@@ -24,6 +24,10 @@ export class CacheManager extends Hookable {
     this.del = this.impl.del.bind(this.impl)
     this.ttl = this.impl.ttl.bind(this.impl)
     this.clear = this.impl.clear.bind(this.impl)
+    this.setn = this.impl.setn.bind(this.impl)
+    this.getn = this.impl.getn.bind(this.impl)
+    this.incr = this.impl.incr.bind(this.impl)
+    this.expire = this.impl.expire.bind(this.impl)
   }
 
   async disconnect() {

@@ -63,4 +63,36 @@ export class MongoCache extends CacheImpl {
   override async clear(): Promise<void> {
     await this.col.deleteMany({})
   }
+
+  override async setn(key: string, value: number, expiresIn: number): Promise<void> {
+    await this.col.updateOne(
+      { _id: key },
+      { $set: { value, expiresAt: new Date(Date.now() + expiresIn) } },
+      { upsert: true }
+    )
+  }
+
+  override async getn(key: string): Promise<number> {
+    const entry = await this.col.findOne({ _id: key })
+    if (!entry || Date.now() > +entry.expiresAt) return 0
+    return typeof entry.value === 'number' ? entry.value : 0
+  }
+
+  override async incr(key: string, amount: number, expiresIn: number): Promise<number> {
+    const now = Date.now()
+    const result = await this.col.findOneAndUpdate(
+      { _id: key },
+      {
+        $inc: { value: amount as never },
+        $setOnInsert: { expiresAt: new Date(now + expiresIn) }
+      },
+      { upsert: true, returnDocument: 'after' }
+    )
+    if (!result || now > +result.expiresAt) return 0
+    return typeof result.value === 'number' ? result.value : 0
+  }
+
+  override async expire(key: string, timeout: number): Promise<void> {
+    await this.col.updateOne({ _id: key }, { $set: { expiresAt: new Date(Date.now() + timeout) } })
+  }
 }

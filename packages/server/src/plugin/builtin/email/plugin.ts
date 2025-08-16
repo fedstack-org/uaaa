@@ -1,12 +1,12 @@
+import { arktypeValidator } from '@hono/arktype-validator'
 import { type } from 'arktype'
-import { HTTPException } from 'hono/http-exception'
+import { Hono } from 'hono'
 import { customAlphabet } from 'nanoid'
 import mailer from 'nodemailer'
-import { BusinessError, logger } from '../../../util/index.js'
+import { getRemoteIP } from '../../../api/_helper.js'
 import type { App, PluginContext } from '../../../index.js'
-import { Hono } from 'hono'
+import { BusinessError, logger } from '../../../util/index.js'
 import { EmailImpl } from './credential.js'
-import { arktypeValidator } from '@hono/arktype-validator'
 
 export const tEmailConfig = type({
   emailTransport: 'unknown',
@@ -14,7 +14,10 @@ export const tEmailConfig = type({
   'emailHtml?': 'string|undefined',
   'emailAllowSignup?': 'boolean|undefined',
   'emailWhitelist?': 'string[]|undefined',
-  'emailLogin?': '"enabled" | "hidden" | "disabled"'
+  'emailLogin?': '"enabled" | "hidden" | "disabled"',
+  'emailRateLimitPerIP?': 'number|undefined',
+  'emailRateLimitPerIPEmail?': 'number|undefined',
+  'emailRateLimitWindow?': 'number|undefined'
 })
 
 type IEmailConfig = typeof tEmailConfig.infer
@@ -38,6 +41,9 @@ export class EmailPlugin {
   html
   allowSignupFromLogin = false
   whitelist?: Array<string | RegExp>
+  rateLimitPerIP: number
+  rateLimitPerIPEmail: number
+  rateLimitWindow: number
 
   constructor(
     public app: App,
@@ -47,6 +53,9 @@ export class EmailPlugin {
     this.from = config.emailFrom ?? '"UAAA System" <system@uaaa.fedstack.org>'
     this.html = config.emailHtml ?? defaultMailHtml
     this.allowSignupFromLogin = config.emailAllowSignup ?? false
+    this.rateLimitPerIP = config.emailRateLimitPerIP ?? 30
+    this.rateLimitPerIPEmail = config.emailRateLimitPerIPEmail ?? 10
+    this.rateLimitWindow = config.emailRateLimitWindow ?? 3600000 // 1 hour
     if (config.emailWhitelist) {
       this.whitelist = []
       for (const item of config.emailWhitelist) {
@@ -83,6 +92,26 @@ export class EmailPlugin {
 
   mailKey(mail: string): string {
     return `mailcode:${btoa(mail)}`
+  }
+
+  private async checkRateLimit(ip: string, email: string): Promise<void> {
+    const ipEmailKey = `email_rate_limit:ip_email:${ip}:${encodeURIComponent(email)}`
+    const ipEmailCount = await this.app.cache.incr(ipEmailKey, 1, this.rateLimitWindow)
+    if (ipEmailCount > this.rateLimitPerIPEmail) {
+      const ipEmailTtl = await this.app.cache.ttl(ipEmailKey)
+      throw new BusinessError('TOO_MANY_REQUESTS', {
+        msg: `Too many emails sent to this address from your IP. Wait for ${Math.ceil(ipEmailTtl / 1000)} seconds`
+      })
+    }
+
+    const ipKey = `email_rate_limit:ip:${ip}`
+    const ipCount = await this.app.cache.incr(ipKey, 1, this.rateLimitWindow)
+    if (ipCount > this.rateLimitPerIP) {
+      const ipTtl = await this.app.cache.ttl(ipKey)
+      throw new BusinessError('TOO_MANY_REQUESTS', {
+        msg: `Too many emails sent from this IP. Wait for ${Math.ceil(ipTtl / 1000)} seconds`
+      })
+    }
   }
 
   private async sendCode(key: string, mail: string, purpose: string) {
@@ -133,7 +162,11 @@ export class EmailPlugin {
         if (!this.checkWhitelist(email)) {
           throw new BusinessError('FORBIDDEN', { msg: 'Email not allowed' })
         }
+
+        const clientIP = getRemoteIP(ctx)
+        await this.checkRateLimit(clientIP, email)
         await this.sendCode(this.mailKey(email), email, 'verification')
+
         return ctx.json({})
       }
     )
