@@ -174,12 +174,9 @@ export const parseAuthorizeParams = (query: LocationQuery) => {
 
 export const useAuthorize = () => {
   const route = useRoute()
-  const { parseAndLoad } = useTransparentUX()
   const params = computed<IAuthorizeParams | { error: string }>(() => {
     const params = parseAuthorizeParams(route.query)
-    if (!('error' in params)) {
-      parseAndLoad(params.params ?? {})
-    } else {
+    if ('error' in params) {
       console.error(`Error parsing authorize params: ${params.error}`)
     }
     return params

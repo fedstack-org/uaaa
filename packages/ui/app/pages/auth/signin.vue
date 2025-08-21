@@ -101,13 +101,13 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const type = useRouteQuery<string>('signin_type', '')
-const { config, parseAndLoad } = useTransparentUX()
+const { config } = useTransparentUX()
 
 if (route.query.redirect) {
   const originalRoute = router.resolve(toSingle(route.query.redirect, '/'))
   const params = parseAuthorizeParams(originalRoute.query)
-  if (!('error' in params)) {
-    parseAndLoad(params.params ?? {})
+  if ('error' in params) {
+    console.error(`Error parsing authorize params: ${params.error}`)
   }
 }
 
@@ -119,9 +119,10 @@ const { data } = await useAsyncData(async () => {
 
 watch(
   [data, config],
-  () => {
-    if (data.value?.includes(config.value?.preferType as any)) {
-      type.value = config.value?.preferType as (typeof data.value)[number]
+  ([data, config], [oldData, oldConfig]) => {
+    if (config?.preferType === oldConfig?.preferType) return
+    if (data?.includes(config?.preferType as any)) {
+      type.value = config?.preferType as (typeof data)[number]
     }
   },
   { immediate: true }

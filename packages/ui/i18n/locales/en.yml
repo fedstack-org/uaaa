@@ -1,5 +1,5 @@
 uaaa: UAAA System
-client-for: '{0} Client'
+client-for: "{0} Client"
 
 pages:
   index: Home
@@ -28,7 +28,7 @@ credentials:
   phone: Phone
   email: Email
   webauthn: Passkey
-  iaaa: Peking University Unified Identity Authentication
+  iaaa: Peking University IAAA
   totp: Mobile Token
 
 actions:
@@ -64,9 +64,9 @@ msg:
   login-by: Login via {0}
   verify-by: Verify via {0}
   credentials: Credential Management
-  credential-type: '{0} Credential'
-  current-security-level: 'Security Level: {0}'
-  upgrade-security-level-to: 'Upgrade Security Level to: {0}'
+  credential-type: "{0} Credential"
+  current-security-level: "Security Level: {0}"
+  upgrade-security-level-to: "Upgrade Security Level to: {0}"
   credential-id: Credential ID
   credential-user-identifier: User Identifier
   credential-global-identifier: Global Identifier
@@ -85,7 +85,7 @@ msg:
   downgrade-security-level: Lower Security Level
   security-level: Security Level
   app: Application
-  request-for: 'Purpose: {0}'
+  request-for: "Purpose: {0}"
   install-app: Configure Application
   permissions: Permissions
   claims: User Information
@@ -115,13 +115,13 @@ msg:
   token-index: Index
   target-app: Target Application
   client-app: Client Application
-  do-in-seconds: '{0} seconds to {1}'
-  missing-required-claims: 'Missing required information: {0}'
-  missing-verified-claims: 'Missing verified information: {0}'
-  missing-required-permissions: 'Missing required permissions: {0}'
-  task-failed-with: 'Task failed: {0}'
-  will-grant-permission-for: 'The following permissions will be granted for the purpose of:'
-  will-grant-claim-for: 'This information will be granted for the purpose of:'
+  do-in-seconds: "{0} seconds to {1}"
+  missing-required-claims: "Missing required information: {0}"
+  missing-verified-claims: "Missing verified information: {0}"
+  missing-required-permissions: "Missing required permissions: {0}"
+  task-failed-with: "Task failed: {0}"
+  will-grant-permission-for: "The following permissions will be granted for the purpose of:"
+  will-grant-claim-for: "This information will be granted for the purpose of:"
   required: Required
   show-grant: Show Authorization Details
   hide-grant: Hide Authorization Details
@@ -164,15 +164,15 @@ claims:
   phone: Phone
   avatar_hash: Avatar ID
   is_admin: Is Administrator
-  'iaaa:name': IAAA Name
-  'iaaa:status': IAAA Status
-  'iaaa:identity_id': Student/Employee ID
-  'iaaa:dept_id': IAAA Department ID
-  'iaaa:dept': IAAA Department
-  'iaaa:identity_type': IAAA Identity Type
-  'iaaa:detail_type': IAAA Detail Type
-  'iaaa:identity_status': IAAA Identity Status
-  'iaaa:campus': Campus
+  "iaaa:name": IAAA Name
+  "iaaa:status": IAAA Status
+  "iaaa:identity_id": Student/Employee ID
+  "iaaa:dept_id": IAAA Department ID
+  "iaaa:dept": IAAA Department
+  "iaaa:identity_type": IAAA Identity Type
+  "iaaa:detail_type": IAAA Detail Type
+  "iaaa:identity_status": IAAA Identity Status
+  "iaaa:campus": Campus
 
 securityLevel:
   0: Verification Required
@@ -194,10 +194,10 @@ errors:
     INVALID_OPERATION: Invalid Operation
     INVALID_TYPE: Invalid Input Format
     NOT_FOUND: Not Found
-    BAD_REQUEST: 'Bad Request: {msg}'
-    FORBIDDEN: 'Access Forbidden: {msg}'
-    TOO_MANY_REQUESTS: 'Too Many Requests: {msg}'
+    BAD_REQUEST: "Bad Request: {msg}"
+    FORBIDDEN: "Access Forbidden: {msg}"
+    TOO_MANY_REQUESTS: "Too Many Requests: {msg}"
   api-hint:
     INSUFFICIENT_SECURITY_LEVEL: Redirecting to verification page
-  error: 'Error occurred: {message}'
+  error: "Error occurred: {message}"
   unknown: Unknown Error
