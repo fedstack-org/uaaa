@@ -89,5 +89,10 @@ export interface ITokenDoc {
   challenge?: string | undefined
   code?: string | undefined
 
+  /** CAS related */
+  ticket?: string | undefined
+  service?: string | undefined
+  type?: 'cas_ticket' | undefined
+
   environment: ITokenEnvironment
 }

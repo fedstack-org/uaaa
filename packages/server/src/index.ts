@@ -9,6 +9,8 @@ import { CredentialManager } from './credential/index.js'
 import { DbManager } from './db/index.js'
 import { OAuthManager } from './oauth/_common.js'
 import { oauthRouter, oauthWellKnownRouter } from './oauth/index.js'
+import { CASManager } from './cas/_common.js'
+import { casRouter } from './cas/index.js'
 import { PluginManager } from './plugin/index.js'
 import { SessionManager } from './session/index.js'
 import { TokenManager } from './token/index.js'
@@ -33,6 +35,7 @@ export class App extends Hookable<{
   token
   session
   oauth
+  cas
 
   server?: ReturnType<typeof serve>
 
@@ -51,6 +54,7 @@ export class App extends Hookable<{
     this.token = new TokenManager(this)
     this.session = new SessionManager(this)
     this.oauth = new OAuthManager(this)
+    this.cas = new CASManager(this)
   }
 
   async init() {
@@ -98,6 +102,7 @@ export class App extends Hookable<{
       })
       .route('/api', rootApi)
       .route('/oauth', oauthRouter)
+      .route('/cas', casRouter)
       .route('/.well-known', new Hono().route('/', oauthWellKnownRouter))
     await this.callHook('extendApp', app)
     this.server = serve({

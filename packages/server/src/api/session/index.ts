@@ -111,6 +111,17 @@ export const sessionApi = new Hono()
     }
   )
   .post(
+    '/cas_ticket',
+    verifyPermission({ path: '/session/derive' }),
+    arktypeValidator('json', type({ service: 'string', appId: 'string' })),
+    async (ctx) => {
+      const { service, appId } = ctx.req.valid('json')
+      const { cas } = ctx.var.app
+      const ticket = await cas.generateServiceTicket(ctx, service, ctx.var.token.sub)
+      return ctx.json({ ticket })
+    }
+  )
+  .post(
     '/try_derive',
     verifyPermission({ path: '/session/derive' }),
     arktypeValidator('json', tDeriveOptions),
