@@ -20,6 +20,16 @@
   </div>
 </div>
 
+## Features
+
+UAAA provides comprehensive authentication and authorization services with support for multiple protocols:
+
+- **OAuth 2.0 / OpenID Connect**: Industry-standard protocols for secure API access and user authentication
+- **CAS Protocol**: Central Authentication Service for single sign-on (SSO) in web applications  
+- **Multi-factor Authentication**: Support for TOTP, WebAuthn, and other authentication methods
+- **Flexible User Management**: Comprehensive user lifecycle and permission management
+- **Plugin Architecture**: Extensible system for custom authentication methods and integrations
+
 ## Build Images
 
 ```sh

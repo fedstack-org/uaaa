@@ -164,9 +164,10 @@ export class CASManager {
 
       // Get user claims for attributes
       const claims = await this.app.claim.filterBasicClaims(ctx, user.claims || {})
+      const attributes = this._buildAttributes(claims)
       
       // Build success response
-      return this._buildSuccessResponse(tokenDoc.userId, claims, format)
+      return this._buildSuccessResponse(tokenDoc.userId, attributes, format)
 
     } catch (error) {
       return this._buildErrorResponse('INTERNAL_ERROR', 'Internal server error')
@@ -190,10 +191,9 @@ export class CASManager {
   }
 
   /**
-   * Build CAS success response XML
+   * Build CAS success response XML (public for testing)
    */
-  private _buildSuccessResponse(user: string, claims: Partial<IUserClaims>, format?: string): string {
-    const attributes = this._buildAttributes(claims)
+  _buildSuccessResponse(user: string, attributes: Record<string, string>, format?: string): string {
     
     if (format === 'JSON') {
       return JSON.stringify({
@@ -227,9 +227,9 @@ export class CASManager {
   }
 
   /**
-   * Build CAS error response XML
+   * Build CAS error response XML (public for testing)
    */
-  private _buildErrorResponse(code: string, description: string): string {
+  _buildErrorResponse(code: string, description: string): string {
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
     xml += '<cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">\n'
     xml += `  <cas:authenticationFailure code="${this._escapeXml(code)}">\n`
@@ -256,9 +256,9 @@ export class CASManager {
   }
 
   /**
-   * Escape XML special characters
+   * Escape XML special characters (public for testing)
    */
-  private _escapeXml(str: string): string {
+  _escapeXml(str: string): string {
     return str
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
