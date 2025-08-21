@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-import { readFile } from 'node:fs/promises'
-import { Cli, Builtins, Command, Option } from 'clipanion'
-import * as t from 'typanion'
+import { Builtins, Cli, Command, Option } from 'clipanion'
 import type { Document } from 'mongodb'
+import { nanoid } from 'nanoid'
+import { readFile } from 'node:fs/promises'
+import * as t from 'typanion'
 import { App } from '../index.js'
 
 abstract class BaseCommand extends Command {
@@ -206,6 +207,63 @@ class UpdateCredentialCommand extends BaseCommand {
   }
 }
 
+class RegisterUserCommand extends BaseCommand {
+  static paths = [[`register-user`], [`ru`]]
+  static usage = Command.Usage({})
+
+  username = Option.String(`-u,--username`, { required: true })
+
+  email = Option.String(`-e,--email`, { required: true })
+  emailVerified = Option.Boolean(`-ev,--email-verified`, { required: true })
+
+  claims = Option.Array(`-c,--claim`, { required: false, arity: 3 })
+
+  async execute() {
+    const app = await this.getApp()
+    const now = Date.now()
+    const { insertedId: userId } = await app.db.users.insertOne({
+      _id: nanoid(),
+      claims: {
+        username: { value: this.username },
+        email: { value: this.email, verified: this.emailVerified || undefined },
+        ...Object.fromEntries(
+          this.claims?.map(([name, value, verified]) => [
+            name,
+            {
+              value,
+              verified: ['1', 'true', 'verified'].includes(verified.toLowerCase())
+                ? true
+                : undefined
+            }
+          ]) || []
+        )
+      },
+      salt: nanoid()
+    })
+    console.log(`User ${userId} registered username=${this.username} email=${this.email}`)
+    if (this.emailVerified) {
+      // Add email credential
+      const { insertedId } = await app.db.credentials.insertOne({
+        _id: nanoid(),
+        globalIdentifier: this.email,
+        userIdentifier: '',
+        userId: userId,
+        type: 'email',
+        data: this.email,
+        secret: '',
+        remark: '',
+        validAfter: now,
+        validBefore: now + 100 * 365 * 24 * 60 * 60 * 1000,
+        validCount: Number.MAX_SAFE_INTEGER,
+        createdAt: now,
+        updatedAt: now,
+        securityLevel: 2
+      })
+      console.log(`Credential ${insertedId} created for email ${this.email}`)
+    }
+  }
+}
+
 const [node, app, ...args] = process.argv
 
 const cli = new Cli({
@@ -218,6 +276,7 @@ cli.register(FindUserCommand)
 cli.register(UpdateUserCommand)
 cli.register(FindCredentialCommand)
 cli.register(UpdateCredentialCommand)
+cli.register(RegisterUserCommand)
 cli.register(Builtins.HelpCommand)
 cli.register(Builtins.VersionCommand)
 cli.runExit(args)
