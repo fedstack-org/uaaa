@@ -10,7 +10,6 @@ export const useTransparentUX = () => {
   const route = useRoute()
 
   const parseTransparentUXConfig = (query: LocationQuery) => {
-    console.log(`parseTransparentUXConfig`, query)
     const config: ITransparentUXConfig = {}
     if (query.preferType) {
       config.preferType = toSingle(query.preferType, '')

@@ -1,6 +1,6 @@
 import type { ApiManager } from '#imports'
-import type { InferResponseType } from 'hono'
 import type { LocationQuery } from '#vue-router'
+import type { InferResponseType } from 'hono'
 
 type IAppDTO = InferResponseType<ApiManager['public']['app'][':id']['$get']>['app']
 
@@ -101,6 +101,7 @@ class OpenIDLogoutConnector extends LogoutConnector {
     await api.logout()
     if (preLogoutResult.redirect) {
       beforeRedirect?.()
+      // FIXME: handle logout state param
       window.location.href = preLogoutResult.redirect
     }
   }

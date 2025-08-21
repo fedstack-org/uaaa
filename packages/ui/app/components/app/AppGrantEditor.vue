@@ -68,7 +68,6 @@ const {} = await useAsyncData(async () => {
     const resp = await api.user.installation[':id'].$get({ param: { id: props.app._id } })
     if (resp.ok) {
       const { installation } = await resp.json()
-      console.log(installation)
       permissions.value = Object.fromEntries(installation.grantedPermissions.map((p) => [p, true]))
       claims.value = Object.fromEntries(installation.grantedClaims.map((c) => [c, true]))
     }
