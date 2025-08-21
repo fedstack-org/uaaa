@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test'
 import { expect } from 'expect'
+import { describe, it } from 'node:test'
 import { Permission, rePermissionPath, rePermissionPathMatcher } from './permission.js'
 
 describe('Permission Utils', () => {
@@ -55,10 +55,10 @@ describe('Permission Class', () => {
   })
 
   it('should throw error for invalid path', () => {
-    expect(() => Permission.fromScopedString('/', 'test')).toThrowError()
-    expect(() => Permission.fromScopedString('/', 'test')).toThrowError()
-    expect(() => Permission.fromScopedString('/a*a*/', 'test')).toThrowError()
-    expect(() => Permission.fromScopedString('/**/a', 'test')).toThrowError()
+    expect(() => Permission.fromScopedString('/', 'test')).toThrow()
+    expect(() => Permission.fromScopedString('/', 'test')).toThrow()
+    expect(() => Permission.fromScopedString('/a*a*/', 'test')).toThrow()
+    expect(() => Permission.fromScopedString('/**/a', 'test')).toThrow()
   })
 
   it('shoud match path', () => {

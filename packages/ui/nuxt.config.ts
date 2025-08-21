@@ -35,7 +35,6 @@ export default defineNuxtConfig({
       //
       { code: 'en', name: 'English', file: 'en.yml' },
       { code: 'zh-Hans', name: '简体中文', file: 'zh-Hans.yml' }
-    ],
-    bundle: { optimizeTranslationDirective: false }
+    ]
   }
 })

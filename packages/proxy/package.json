@@ -21,21 +21,21 @@
     "uaaa-proxy": "lib/cli/index.js"
   },
   "dependencies": {
-    "@fastify/http-proxy": "^11.1.2",
+    "@fastify/http-proxy": "^11.3.0",
     "@fastify/sensible": "^6.0.3",
-    "@hono/node-server": "^1.14.1",
+    "@hono/node-server": "^1.19.0",
     "@uaaa/core": "workspace:^",
     "arktype": "^2.1.20",
     "clipanion": "^4.0.0-rc.4",
-    "fastify": "^5.3.3",
-    "hono": "^4.7.9",
+    "fastify": "^5.5.0",
+    "hono": "^4.9.2",
     "hookable": "^5.5.3",
-    "jose": "^6.0.11",
-    "pino": "^9.6.0",
+    "jose": "^6.0.12",
+    "pino": "^9.9.0",
     "typanion": "^3.14.0"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2",
-    "typescript": "^5.8.3"
+    "concurrently": "^9.2.0",
+    "typescript": "^5.9.2"
   }
 }
