@@ -261,6 +261,8 @@ class RegisterUserCommand extends BaseCommand {
       })
       console.log(`Credential ${insertedId} created for email ${this.email}`)
     }
+    await app.stop()
+    console.log(`User ${userId} registered successfully`)
   }
 }
 
