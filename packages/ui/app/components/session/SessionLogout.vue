@@ -65,12 +65,12 @@ const { run: cancel, running: cancelRunning } = useTask(async () => {
 <i18n>
 zh-Hans:
   msg:
-    logout_hint: 您已成功登出{name}。点按确定将使您也退出UAAA身份认证系统。
-    logout_hint_untrusted: 您似乎刚刚登出了{name}。点按确定将使您退出UAAA身份认证系统。
-    logout_hint_generic: 您正在执行登出操作。点按确定将使您退出UAAA身份认证系统。
+    logout_hint: 您已成功登出{name}。点按登出将使您也退出UAAA身份认证系统。
+    logout_hint_untrusted: 您似乎刚刚登出了{name}。点按登出将使您退出UAAA身份认证系统。
+    logout_hint_generic: 您正在执行登出操作。点按登出将使您退出UAAA身份认证系统。
 en:
   msg:
-    logout_hint: You have successfully logged out of {name}. Press OK to log out of UAAA.
-    logout_hint_untrusted: You seem to have just logged out of {name}. Press OK to log out of UAAA.
-    logout_hint_generic: You are performing a logout operation. Press OK to log out of UAAA.
+    logout_hint: You have successfully logged out of {name}. Press Logout to log out of UAAA.
+    logout_hint_untrusted: You seem to have just logged out of {name}. Press Logout to log out of UAAA.
+    logout_hint_generic: You are performing a logout operation. Press Logout to log out of UAAA.
 </i18n>
