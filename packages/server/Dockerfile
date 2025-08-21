@@ -19,4 +19,6 @@ COPY --from=builder /app/packages/core/lib ./packages/core/lib
 COPY --from=builder /app/packages/server/lib ./packages/server/lib
 USER node
 VOLUME [ "/etc/uaaa" ]
-CMD ["node", "packages/server/lib/cli/index.js", "serve", "--config", "/etc/uaaa/config.json"]
+ENV UAAA_SERVER_CONFIG_PATH=/etc/uaaa/config.json
+ENTRYPOINT ["node", "packages/server/lib/cli/index.js"]
+CMD ["serve"]
