@@ -74,9 +74,7 @@ const { run: authorize, running } = useTask(async () => {
     return symNoToast
   }
   try {
-    await props.params.connector.onAuthorize(props.params, app.value, () => {
-      resetTransparentUXData()
-    })
+    await props.params.connector.onAuthorize(props.params, app.value)
     router.replace('/')
   } catch (err) {
     if (isAPIError(err)) {
