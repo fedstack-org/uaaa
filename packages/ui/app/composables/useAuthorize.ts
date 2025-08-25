@@ -84,14 +84,12 @@ class OpenIDConnector extends Connector {
       })
       await api.checkResponse(resp)
     } else {
-      const redirectParams = new URLSearchParams({
-        code: data.code,
-        state
-      })
       beforeRedirect?.()
       await sleep(200)
-      const url = redirect_uri + '?' + redirectParams.toString()
-      location.href = url
+      const url = new URL(redirect_uri)
+      url.searchParams.set('code', data.code)
+      url.searchParams.set('state', state)
+      location.href = url.toString()
     }
   }
 
@@ -103,20 +101,16 @@ class OpenIDConnector extends Connector {
     if (!('code' in response) || typeof response.code !== 'string') {
       throw new Error('Invalid response')
     }
-    const redirectParams = new URLSearchParams({
-      code: response.code,
-      state: response.state as string
-    })
-    const url = redirect_uri + '?' + redirectParams.toString()
-    location.href = url
+    const url = new URL(redirect_uri)
+    url.searchParams.set('code', response.code)
+    url.searchParams.set('state', response.state as string)
+    location.href = url.toString()
   }
 
   override async onCancel(params: IAuthorizeParams, app: IAppDTO): Promise<void> {
-    const redirectParams = new URLSearchParams({
-      error: 'access_denied'
-    })
-    const url = params.params.redirect_uri + '?' + redirectParams.toString()
-    location.href = url
+    const url = new URL(params.params.redirect_uri)
+    url.searchParams.set('error', 'access_denied')
+    location.href = url.toString()
   }
 }
 
