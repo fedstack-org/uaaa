@@ -5,6 +5,7 @@ export const credentialIcon = (type: string) => {
     case 'email':
       return 'mdi-email'
     case 'phone':
+    case 'sms':
       return 'mdi-phone'
     case 'totp':
       return 'mdi-numeric'

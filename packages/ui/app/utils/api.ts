@@ -11,6 +11,7 @@ import type {
   SecurityLevel
 } from '@uaaa/server'
 import type { IEmailApi } from '@uaaa/server/lib/plugin/builtin/email'
+import type { ISmsApi } from '@uaaa/server/lib/plugin/builtin/sms'
 import type { IWebauthnApi } from '@uaaa/server/lib/plugin/builtin/webauthn'
 import { hc } from 'hono/client'
 
@@ -72,6 +73,7 @@ export class ApiManager {
   console
 
   email
+  sms
   webauthn
 
   constructor() {
@@ -97,6 +99,7 @@ export class ApiManager {
     this.console = hc<IConsoleApi>('/api/console', { headers })
 
     this.email = hc<IEmailApi>('/api/plugin/email', { headers })
+    this.sms = hc<ISmsApi>('/api/plugin/sms', { headers })
     this.webauthn = hc<IWebauthnApi>('/api/plugin/webauthn', { headers })
 
     this.isLoggedIn.value && setTimeout(() => this.getSessionClaims().catch(console.error), 0)

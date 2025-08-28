@@ -26,6 +26,7 @@ credentials:
   password: Password
   passkey: Passkey
   phone: Phone
+  sms: SMS
   email: Email
   webauthn: Passkey
   iaaa: Peking University IAAA
@@ -151,6 +152,12 @@ msg:
   email-otp-hint: |
     Step 2:
     Enter the numeric verification code received in your email
+  sms-phone-hint: |
+    Step 1:
+    Enter your phone number and send verification code
+  sms-otp-hint: |
+    Step 2:
+    Enter the numeric verification code received via SMS
   login-hint: |
     Please carefully check the page URL to ensure you are logging into the correct website
     Note:
