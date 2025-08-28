@@ -431,6 +431,17 @@ export class SessionManager extends Hookable<{
   }
 
   async checkDeriveInstall(clientApp: IAppDoc, userId: string) {
+    const user = await this.app.db.users.findOne({ _id: userId, disabled: { $ne: true } })
+    if (!user) {
+      throw new BusinessError('BAD_REQUEST', { msg: 'User not found or disabled' })
+    }
+    if (user.appWhitelist && !user.appWhitelist.includes(clientApp._id)) {
+      throw new BusinessError('BAD_REQUEST', { msg: 'User not authorized to this app' })
+    }
+    if (user.appBlacklist?.includes(clientApp._id)) {
+      throw new BusinessError('BAD_REQUEST', { msg: 'User not authorized to this app' })
+    }
+
     if (clientApp.config?.autoInstall) {
       const now = Date.now()
       const installation = await this.app.db.installations.findOneAndUpdate(

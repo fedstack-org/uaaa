@@ -23,4 +23,6 @@ export interface IUserDoc {
   salt: string
 
   disabled?: true | undefined
+  appWhitelist?: string[]
+  appBlacklist?: string[]
 }
