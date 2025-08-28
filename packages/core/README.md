@@ -1,1 +1,1 @@
-# @uaaa/core
+# UAAA Core
