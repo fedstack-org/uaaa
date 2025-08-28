@@ -7,12 +7,22 @@ import * as t from 'typanion'
 import { App } from '../index.js'
 
 abstract class BaseCommand extends Command {
+  configJson = Option.String(`--config-json`, {
+    env: 'UAAA_SERVER_CONFIG_JSON',
+    hidden: true,
+    required: false
+  })
   config = Option.String(`--config`, { env: 'UAAA_SERVER_CONFIG_PATH' })
   private _app?: Promise<App>
 
+  private async _getConfigText() {
+    if (this.configJson) return this.configJson
+    if (this.config) return readFile(this.config, `utf8`)
+    throw new Error(`Config path is required`)
+  }
+
   private async _getApp() {
-    if (!this.config) throw new Error(`Config path is required`)
-    const configText = await readFile(this.config, `utf8`)
+    const configText = await this._getConfigText()
     const config = JSON.parse(configText)
     const app = new App(config)
     await app.init()

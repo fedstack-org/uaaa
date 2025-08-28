@@ -114,7 +114,7 @@ if (route.query.redirect) {
 const { data } = await useAsyncData(async () => {
   const resp = await api.public.login.$get()
   const { types } = await resp.json()
-  return types.filter((type) => t(`credentials.${type}`) !== `credentials.${type}`)
+  return Object.keys(types).filter((type) => t(`credentials.${type}`) !== `credentials.${type}`)
 })
 
 watch(

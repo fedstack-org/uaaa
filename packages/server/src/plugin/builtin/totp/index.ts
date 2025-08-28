@@ -41,22 +41,20 @@ class TOTPImpl extends CredentialImpl {
     this.newCredentialSecurityLevel = config.totpSecurityLevel ?? SECURITY_LEVEL.HIGH
   }
 
-  override async showElevate(ctx: CredentialContext, userId: string, targetLevel: SecurityLevel) {
-    const credential = await ctx.app.db.credentials.findOne({
-      userId,
-      type: this.type,
-      disabled: { $ne: true },
-      securityLevel: { $gte: targetLevel }
-    })
-    return !!credential
+  override async showLogin(ctx: CredentialContext) {
+    return null
   }
 
-  override async showBindNew(ctx: CredentialContext, userId: string) {
+  override async showVerify() {
+    return {}
+  }
+
+  override async showBind(ctx: CredentialContext, userId: string) {
     const credential = await ctx.app.db.credentials.findOne({
       userId,
       type: this.type
     })
-    return !credential
+    return credential ? null : { securityLevel: this.newCredentialSecurityLevel }
   }
 
   override async verify(

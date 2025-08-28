@@ -1,5 +1,5 @@
 uaaa: UAAA系统
-client-for: '{0}客户端'
+client-for: "{0}客户端"
 
 pages:
   index: 首页
@@ -64,8 +64,9 @@ msg:
   login-by: 通过{0}登录
   verify-by: 通过{0}验证
   credentials: 凭据管理
-  credential-type: '{0}凭据'
+  credential-type: "{0}凭据"
   current-security-level: 安全级别：{0}
+  account-security-level: "账户安全级别：{0}"
   upgrade-security-level-to: 提升安全级别至：{0}
   credential-id: 凭据ID
   credential-user-identifier: 用户标识
@@ -115,11 +116,11 @@ msg:
   token-index: 序号
   target-app: 目标应用
   client-app: 使用应用
-  do-in-seconds: '{0}秒后执行{1}'
-  missing-required-claims: '缺少必要的信息：{0}'
-  missing-verified-claims: '缺少已验证的信息：{0}'
-  missing-required-permissions: '缺少必要的权限：{0}'
-  task-failed-with: '任务失败：{0}'
+  do-in-seconds: "{0}秒后执行{1}"
+  missing-required-claims: "缺少必要的信息：{0}"
+  missing-verified-claims: "缺少已验证的信息：{0}"
+  missing-required-permissions: "缺少必要的权限：{0}"
+  task-failed-with: "任务失败：{0}"
   will-grant-permission-for: 将授予下列权限，用途为：
   will-grant-claim-for: 将授予该信息，用途为：
   required: 必选
@@ -164,15 +165,15 @@ claims:
   phone: 手机
   avatar_hash: 头像标识
   is_admin: 是否管理员
-  'iaaa:name': IAAA姓名
-  'iaaa:status': IAAA状态
-  'iaaa:identity_id': 学工号
-  'iaaa:dept_id': IAAA部门ID
-  'iaaa:dept': IAAA部门
-  'iaaa:identity_type': IAAA身份类型
-  'iaaa:detail_type': IAAA详细类型
-  'iaaa:identity_status': IAAA身份状态
-  'iaaa:campus': 校区
+  "iaaa:name": IAAA姓名
+  "iaaa:status": IAAA状态
+  "iaaa:identity_id": 学工号
+  "iaaa:dept_id": IAAA部门ID
+  "iaaa:dept": IAAA部门
+  "iaaa:identity_type": IAAA身份类型
+  "iaaa:detail_type": IAAA详细类型
+  "iaaa:identity_status": IAAA身份状态
+  "iaaa:campus": 校区
 
 securityLevel:
   0: 需要验证

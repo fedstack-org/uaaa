@@ -94,7 +94,7 @@ const { config } = useTransparentUX()
 const { data } = await useAsyncData(async () => {
   const resp = await api.session.upgrade.$get({ query: { targetLevel: targetLevel.value } })
   const { types } = await resp.json()
-  return types.filter((type) => t(`credentials.${type}`) !== `credentials.${type}`)
+  return Object.keys(types).filter((type) => t(`credentials.${type}`) !== `credentials.${type}`)
 })
 
 watch(

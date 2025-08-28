@@ -44,6 +44,18 @@ export class WebauthnImpl extends CredentialImpl {
     this.app = plugin.app
   }
 
+  override async showLogin() {
+    return {}
+  }
+
+  override async showVerify() {
+    return {}
+  }
+
+  override async showBind(ctx: CredentialContext, userId: string) {
+    return { securityLevel: SECURITY_LEVEL.HIGH }
+  }
+
   override async verify(
     ctx: CredentialContext,
     userId: string,

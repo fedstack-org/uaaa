@@ -11,6 +11,7 @@ import { BusinessError } from '../../../util/index.js'
 import { definePlugin } from '../../_common.js'
 
 const tPasswordConfig = type({
+  'passwordLogin?': '"enabled" | "hidden" | "disabled"',
   'passwordExpiration?': 'number|string',
   'passwordTimeout?': 'number|string'
 })
@@ -36,10 +37,12 @@ class PasswordImpl extends CredentialImpl {
   readonly type = 'password'
   defaultLevel = SECURITY_LEVEL.MEDIUM
   passwordExpiration
+  loginType
 
   constructor(config: IPasswordConfig) {
     super()
     this.passwordExpiration = this.parseTimeout(config.passwordExpiration ?? '100y')
+    this.loginType = config.passwordLogin ?? 'enabled'
   }
 
   private parseTimeout(timeout: number | string) {
@@ -51,6 +54,10 @@ class PasswordImpl extends CredentialImpl {
   }
 
   override async login(ctx: CredentialContext, _payload: unknown) {
+    if (this.loginType === 'disabled') {
+      throw new BusinessError('FORBIDDEN', { msg: 'Password login is disabled' })
+    }
+
     const payload = PasswordImpl.tPasswordLoginPayload(_payload)
     if (payload instanceof type.errors) {
       throw new BusinessError('BAD_REQUEST', { msg: payload.summary })
@@ -85,22 +92,21 @@ class PasswordImpl extends CredentialImpl {
     }
   }
 
-  override async showElevate(ctx: CredentialContext, userId: string, targetLevel: SecurityLevel) {
-    const credential = await ctx.app.db.credentials.findOne({
-      userId,
-      type: 'password',
-      disabled: { $ne: true },
-      securityLevel: { $gte: targetLevel }
-    })
-    return !!credential
+  override async showLogin(ctx: CredentialContext) {
+    if (this.loginType !== 'enabled') return null
+    return {}
   }
 
-  override async showBindNew(ctx: CredentialContext, userId: string) {
+  override async showVerify() {
+    return {}
+  }
+
+  override async showBind(ctx: CredentialContext, userId: string) {
     const credential = await ctx.app.db.credentials.findOne({
       userId,
       type: 'password'
     })
-    return !credential
+    return credential ? null : { securityLevel: this.defaultLevel }
   }
 
   override async verify(

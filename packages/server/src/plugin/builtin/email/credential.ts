@@ -34,9 +34,9 @@ export class EmailImpl extends CredentialImpl {
     return { email: checked.email }
   }
 
-  override async showLogin(ctx: CredentialContext): Promise<boolean> {
-    if (this.loginType !== 'enabled') return false
-    return super.showLogin(ctx)
+  override async showLogin(ctx: CredentialContext) {
+    if (this.loginType !== 'enabled') return null
+    return {}
   }
 
   override async login(ctx: CredentialContext, payload: unknown) {
@@ -93,22 +93,16 @@ export class EmailImpl extends CredentialImpl {
     throw new BusinessError('NOT_FOUND', { msg: 'User not found' })
   }
 
-  override async showElevate(ctx: CredentialContext, userId: string, targetLevel: SecurityLevel) {
-    const credential = await ctx.app.db.credentials.findOne({
-      userId,
-      type: 'email',
-      disabled: { $ne: true },
-      securityLevel: { $gte: targetLevel }
-    })
-    return !!credential
+  override async showVerify() {
+    return {}
   }
 
-  override async showBindNew(ctx: CredentialContext, userId: string) {
+  override async showBind(ctx: CredentialContext, userId: string) {
     const credential = await ctx.app.db.credentials.findOne({
       userId,
       type: 'email'
     })
-    return !credential
+    return credential ? null : { securityLevel: this.defaultLevel }
   }
 
   override async verify(

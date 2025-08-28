@@ -4,7 +4,13 @@ import { Hookable } from 'hookable'
 import type { MatchKeysAndValues } from 'mongodb'
 import { nanoid } from 'nanoid'
 import type { ITokenDoc } from '../db/model/token.js'
-import { BusinessError, type App, type CredentialType, type ICredentialDoc } from '../index.js'
+import {
+  BusinessError,
+  type App,
+  type CredentialType,
+  type ICredentialDoc,
+  type ICredentialTypeMap
+} from '../index.js'
 
 export class CredentialContext {
   app
@@ -29,6 +35,16 @@ export class CredentialContext {
     if (!this._credentialChain) this._credentialChain = this._getCredentialChain()
     return this._credentialChain
   }
+}
+
+export interface ICredentialLoginInfo {
+  recommended?: boolean
+}
+export interface ICredentialVerifyInfo {
+  recommended?: boolean
+}
+export interface ICredentialBindInfo {
+  securityLevel: SecurityLevel
 }
 
 export interface ICredentialLoginResult {
@@ -66,33 +82,18 @@ export interface ICredentialEnsureResult {
 export abstract class CredentialImpl {
   abstract get type(): CredentialType
 
-  async showLogin(ctx: CredentialContext): Promise<boolean> {
-    return !!this.login
-  }
+  abstract showLogin(ctx: CredentialContext): Promise<ICredentialLoginInfo | null>
+
+  abstract showVerify(
+    ctx: CredentialContext,
+    userId: string,
+    targetLevel: SecurityLevel,
+    matchedCredentials: ICredentialDoc[]
+  ): Promise<ICredentialVerifyInfo | null>
+
+  abstract showBind(ctx: CredentialContext, userId: string): Promise<ICredentialBindInfo | null>
 
   login?(ctx: CredentialContext, payload: unknown): Promise<ICredentialLoginResult>
-
-  async showElevate(
-    ctx: CredentialContext,
-    userId: string,
-    targetLevel: SecurityLevel
-  ): Promise<boolean> {
-    const credential = await ctx.app.db.credentials.findOne({
-      userId,
-      type: this.type,
-      disabled: { $ne: true },
-      securityLevel: { $gte: targetLevel }
-    })
-    return !!credential
-  }
-
-  async showBindNew(
-    ctx: CredentialContext,
-    userId: string,
-    targetLevel?: SecurityLevel
-  ): Promise<boolean> {
-    return true
-  }
 
   abstract verify(
     ctx: CredentialContext,
@@ -130,11 +131,12 @@ export class CredentialManager extends Hookable<{}> {
   }
 
   async getLoginTypes(ctx: Context) {
-    const types: CredentialType[] = []
+    const types: Record<CredentialType, ICredentialLoginInfo> = Object.create(null)
     const credentialCtx = new CredentialContext(this, ctx)
     for (const impl of Object.values(this.impls)) {
-      if (await impl.showLogin(credentialCtx)) {
-        types.push(impl.type)
+      const info = await impl.showLogin(credentialCtx)
+      if (info) {
+        types[impl.type] = info
       }
     }
     return types
@@ -149,22 +151,34 @@ export class CredentialManager extends Hookable<{}> {
   }
 
   async getVerifyTypes(ctx: Context, userId: string, targetLevel: SecurityLevel) {
-    const types: CredentialType[] = []
+    const types: Record<CredentialType, ICredentialVerifyInfo> = Object.create(null)
     const credentialCtx = new CredentialContext(this, ctx)
-    for (const impl of Object.values(this.impls)) {
-      if (await impl.showElevate(credentialCtx, userId, targetLevel)) {
-        types.push(impl.type)
+    const credentialMap = await this.app.db.credentials
+      .find({
+        userId,
+        disabled: { $ne: true },
+        securityLevel: { $gte: targetLevel }
+      })
+      .toArray()
+      .then((credentials) => Object.groupBy(credentials, (cred) => cred.type))
+    for (const [type, credentials] of Object.entries(credentialMap)) {
+      const impl = this.impls[type]
+      if (!impl) continue
+      const info = await impl.showVerify(credentialCtx, userId, targetLevel, credentials)
+      if (info) {
+        types[impl.type] = info
       }
     }
     return types
   }
 
-  async getBindTypes(ctx: Context, userId: string, targetLevel?: SecurityLevel) {
-    const types: CredentialType[] = []
+  async getBindTypes(ctx: Context, userId: string) {
+    const types: Record<CredentialType, ICredentialBindInfo> = Object.create(null)
     const credentialCtx = new CredentialContext(this, ctx)
     for (const impl of Object.values(this.impls)) {
-      if (await impl.showBindNew(credentialCtx, userId, targetLevel)) {
-        types.push(impl.type)
+      const info = await impl.showBind(credentialCtx, userId)
+      if (info) {
+        types[impl.type] = info
       }
     }
     return types
@@ -311,7 +325,7 @@ export class CredentialManager extends Hookable<{}> {
     const loginTypes = await this.getLoginTypes(ctx.httpCtx)
     const loginCredentialCount = await ctx.app.db.credentials.countDocuments({
       userId,
-      type: { $in: loginTypes }
+      type: { $in: Object.keys(loginTypes) as Array<keyof ICredentialTypeMap> }
     })
     if (loginCredentialCount <= 1) {
       throw new BusinessError('CRED_NO_UNBIND_LAST', {})
