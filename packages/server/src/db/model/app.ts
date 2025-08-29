@@ -26,7 +26,10 @@ export type IAppRequestedPermission = typeof tAppRequestedPermission.infer
 
 export const tAppGeneralConfig = type({
   'promoted?': 'boolean',
-  'autoInstall?': 'boolean'
+  'autoInstall?': type('boolean', '|', {
+    'grantedPermissions?': 'string[]',
+    'grantedClaims?': 'string[]'
+  })
 })
 
 export type IAppGeneralConfig = typeof tAppGeneralConfig.infer

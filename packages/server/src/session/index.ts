@@ -444,6 +444,10 @@ export class SessionManager extends Hookable<{
 
     if (clientApp.config?.autoInstall) {
       const now = Date.now()
+      const { grantedPermissions = [], grantedClaims = [] } =
+        typeof clientApp.config.autoInstall === 'object' ? clientApp.config.autoInstall : {}
+      const permissions = new Set(grantedPermissions)
+      const claims = new Set(grantedClaims)
       const installation = await this.app.db.installations.findOneAndUpdate(
         { userId, appId: clientApp._id },
         {
@@ -451,10 +455,14 @@ export class SessionManager extends Hookable<{
           $set: { version: clientApp.version, updatedAt: now },
           $addToSet: {
             grantedPermissions: {
-              $each: clientApp.requestedPermissions.filter((p) => p.required).map((p) => p.perm)
+              $each: clientApp.requestedPermissions
+                .filter((p) => p.required || permissions.has(p.perm))
+                .map((p) => p.perm)
             },
             grantedClaims: {
-              $each: clientApp.requestedClaims.filter((c) => c.required).map((c) => c.name)
+              $each: clientApp.requestedClaims
+                .filter((c) => c.required || claims.has(c.name))
+                .map((c) => c.name)
             }
           }
         },
