@@ -1,7 +1,7 @@
 import { type } from 'arktype'
 import { Hookable } from 'hookable'
-import { rAppId } from '../util/index.js'
 import type { App, UAAA } from '../index.js'
+import { rAppId } from '../util/index.js'
 
 const tAppConfig = type({
   appId: type('string').narrow((s): s is UAAA => rAppId.test(s)),
@@ -14,14 +14,9 @@ const tAppConfig = type({
   tokenTimeout: 'string|string[]',
   'realIpHeader?': 'string',
   'trustedUpstreamIssuers?': 'string[]',
-  'openidClaimConfig?': type.Record(
-    'string',
-    type({
-      alias: 'string',
-      'verifiable?': 'boolean'
-    })
-  ),
-  'openidAdditionalClaims?': type.Record('string', 'string')
+  'openidClaimConfig?': type.Record('string', type({ alias: 'string', 'verifiable?': 'boolean' })),
+  'openidAdditionalClaims?': 'Record<string,string>',
+  'uiPath?': 'string'
 })
 
 type IAppConfig = typeof tAppConfig.infer

@@ -2,11 +2,20 @@ services:
   server:
     build:
       context: .
-      dockerfile: packages/server/Dockerfile
+      dockerfile: Dockerfile
+      target: server
     image: git.pku.edu.cn/uaaa/server:${TAG:-latest}
+  
+  server-full:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server-full
+    image: git.pku.edu.cn/uaaa/server-full:${TAG:-latest}
 
   ui:
     build:
       context: .
-      dockerfile: packages/ui/Dockerfile
+      dockerfile: Dockerfile
+      target: ui
     image: git.pku.edu.cn/uaaa/ui:${TAG:-latest}

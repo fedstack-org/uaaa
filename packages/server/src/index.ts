@@ -1,6 +1,8 @@
 import { serve } from '@hono/node-server'
+import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { Hookable } from 'hookable'
+import { stat } from 'node:fs/promises'
 import { rootApi } from './api/index.js'
 import { CacheManager } from './cache/index.js'
 import { ClaimManager } from './claim/index.js'
@@ -100,6 +102,17 @@ export class App extends Hookable<{
       .route('/oauth', oauthRouter)
       .route('/.well-known', new Hono().route('/', oauthWellKnownRouter))
     await this.callHook('extendApp', app)
+    const uiPath = this.config.get('uiPath')
+    if (uiPath) {
+      try {
+        const fstat = await stat(uiPath)
+        if (!fstat.isDirectory()) throw new Error('UI path must be a directory')
+        app.use('*', serveStatic({ root: uiPath }), async (ctx) => ctx.redirect('/', 303))
+        logger.info(`Serving UI at '${uiPath}'`)
+      } catch (err) {
+        logger.warn(`UI path '${uiPath}' not valid: ${err}`)
+      }
+    }
     this.server = serve({
       fetch: app.fetch,
       port: this.config.get('port')
