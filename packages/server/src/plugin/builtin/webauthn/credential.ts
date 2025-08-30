@@ -45,7 +45,7 @@ export class WebauthnImpl extends CredentialImpl {
   }
 
   override async showLogin() {
-    return {}
+    return null
   }
 
   override async showVerify() {
