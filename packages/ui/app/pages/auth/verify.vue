@@ -5,7 +5,7 @@
         <VIcon size="128">
           <CommonLogo variant="flat" />
         </VIcon>
-        <div class="flex self-stretch">
+        <div class="flex self-stretch items-start">
           <div class="flex-1 flex justify-start">
             <VFadeTransition mode="out-in">
               <VBtn icon="mdi-arrow-left" size="sm" variant="tonal" color="info" @click="onBack" />
