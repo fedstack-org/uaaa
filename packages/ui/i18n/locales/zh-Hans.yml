@@ -80,6 +80,7 @@ msg:
   manage-session: 会话管理
   tips: 提示
   not-implemented: 功能尚未实现
+  no-login-methods: 没有可用的登录方式
   no-verify-methods: 没有可用的验证方式
   no-verify-methods-hint: |
     您还没有绑定足够安全的凭据，暂时无法访问此功能

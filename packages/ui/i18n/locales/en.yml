@@ -80,6 +80,7 @@ msg:
   manage-session: Session Management
   tips: Tips
   not-implemented: Feature Not Implemented
+  no-login-methods: No signin methods available
   no-verify-methods: No Verification Methods Available
   no-verify-methods-hint: |
     You haven't bound sufficient secure credentials and cannot access this feature.

@@ -5,7 +5,7 @@
         <VIcon size="128">
           <CommonLogo variant="flat" />
         </VIcon>
-        <div class="flex self-stretch">
+        <div class="flex self-stretch items-start">
           <div class="flex-1 flex justify-start">
             <VFadeTransition mode="out-in">
               <VBtn
@@ -18,10 +18,13 @@
               />
             </VFadeTransition>
           </div>
-          <div>{{ t('pages.auth.signin') }}</div>
+          <div class="text-center">
+            <div>{{ t('pages.auth.signin') }}</div>
+            <div v-if="data?.app" class="text-caption">{{ data.app.name }}</div>
+          </div>
           <div class="flex-1 flex justify-end">
             <VBtn
-              v-if="showRemote"
+              v-if="showRemote && data?.allowRemoteAuthorize"
               icon="mdi-qrcode"
               size="sm"
               variant="text"
@@ -33,7 +36,13 @@
         </div>
       </VCardTitle>
       <VDivider />
-      <VAlert type="info" rounded="0" variant="tonal" class="whitespace-pre-line">
+      <VAlert
+        v-if="te('msg.login-hint')"
+        type="info"
+        rounded="0"
+        variant="tonal"
+        class="whitespace-pre-line"
+      >
         {{ t('msg.login-hint') }}
       </VAlert>
       <template v-if="uiConfig.signInNotice">
@@ -69,10 +78,11 @@
             </VOverlay>
           </div>
         </template>
-        <template v-else-if="!type">
-          <VCardText class="flex flex-col gap-2" v-if="data">
+        <CredentialForm v-else-if="type" action="login" :type="type" @updated="postLogin" />
+        <template v-else-if="data">
+          <VCardText class="flex flex-col gap-2" v-if="data.allowedTypes.length">
             <VBtn
-              v-for="loginType of data"
+              v-for="loginType of data.allowedTypes"
               :key="loginType"
               variant="tonal"
               class="justify-start"
@@ -81,8 +91,9 @@
               @click="type = loginType"
             />
           </VCardText>
+          <VAlert type="error" :title="t('no-login-methods')" />
         </template>
-        <CredentialForm v-else action="login" :type="type" @updated="postLogin" />
+        <VAlert v-else-if="error" type="error" :text="error.message" />
       </VFadeTransition>
     </VCard>
   </VContainer>
@@ -97,32 +108,50 @@ useHead({
   title: 'Sign-In'
 })
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const type = useRouteQuery<string>('signin_type', '')
 const { config } = useTransparentUX()
-
-if (route.query.redirect) {
+const authorizeParams = computed(() => {
   const originalRoute = router.resolve(toSingle(route.query.redirect, '/'))
+  if (!originalRoute.path.startsWith('/authorize')) return null
   const params = parseAuthorizeParams(originalRoute.query)
   if ('error' in params) {
     console.error(`Error parsing authorize params: ${params.error}`)
+    return null
   }
-}
-
-const { data } = await useAsyncData(async () => {
-  const resp = await api.public.login.$get()
-  const { types } = await resp.json()
-  return Object.keys(types).filter((type) => t(`credentials.${type}`) !== `credentials.${type}`)
+  return params
 })
+
+const { data, error } = await useAsyncData(
+  () => `login-params-${authorizeParams.value?.appId ?? ':self:'}`,
+  async () => {
+    const typesResp = await api.public.login.$get()
+    const { types } = await typesResp.json()
+    let allowedTypes = Object.keys(types)
+    // Filter UI Supported types
+    allowedTypes = allowedTypes.filter((type) => te(`credentials.${type}`))
+    if (!authorizeParams.value) return { allowedTypes, allowRemoteAuthorize: true, app: null }
+    const { appId } = authorizeParams.value
+    const appResp = await api.public.app[':id'].$get({ param: { id: appId } })
+    await api.checkResponse(appResp)
+    const { app } = await appResp.json()
+    if (app.variables['ui:allowed_login_types']) {
+      const whitelist = app.variables['ui:allowed_login_types'].split(',').map((t) => t.trim())
+      allowedTypes = allowedTypes.filter((type) => whitelist.includes(type))
+    }
+    const allowRemoteAuthorize = (app.variables['ui:allow_remote_authorize'] ?? 'true') === 'true'
+    return { allowedTypes, allowRemoteAuthorize, app }
+  }
+)
 
 watch(
   [data, config],
   ([data, config], [oldData, oldConfig]) => {
     if (config?.preferType === oldConfig?.preferType) return
-    if (data?.includes(config?.preferType as any)) {
-      type.value = config?.preferType as (typeof data)[number]
+    if (data?.allowedTypes.includes(config?.preferType as any)) {
+      type.value = config?.preferType as string
     }
   },
   { immediate: true }
