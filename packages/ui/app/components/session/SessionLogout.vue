@@ -58,7 +58,6 @@ const { run: logout, running: logoutRunning } = useTask(async () => {
 const { run: cancel, running: cancelRunning } = useTask(async () => {
   if (!data.value) return
   await params.connector.onCancel(data.value, params)
-  router.replace('/')
   return symNoToast
 })
 

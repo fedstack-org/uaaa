@@ -75,7 +75,6 @@ const { run: authorize, running } = useTask(async () => {
   }
   try {
     await props.params.connector.onAuthorize(props.params, app.value)
-    router.replace('/')
   } catch (err) {
     if (isAPIError(err)) {
       switch (err.code) {
