@@ -102,7 +102,7 @@ class OpenIDLogoutConnector extends LogoutConnector {
     if (preLogoutResult.redirect) {
       beforeRedirect?.()
       // FIXME: handle logout state param
-      window.location.href = preLogoutResult.redirect
+      redirectToApp(preLogoutResult.app?._id ?? '', preLogoutResult.redirect)
     }
   }
 
@@ -113,7 +113,7 @@ class OpenIDLogoutConnector extends LogoutConnector {
   ) {
     if (preLogoutResult.redirect) {
       beforeRedirect?.()
-      window.location.href = preLogoutResult.redirect
+      redirectToApp(preLogoutResult.app?._id ?? '', preLogoutResult.redirect)
     }
   }
 }

@@ -11,6 +11,7 @@ pages:
   authorize: 授权
   remote-authorize: 远程授权
   logout: 登出
+  farewell: 即将进入
   auth:
     signin: 登录
     signout: 登出

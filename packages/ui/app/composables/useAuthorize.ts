@@ -89,7 +89,7 @@ class OpenIDConnector extends Connector {
       const url = new URL(redirect_uri)
       url.searchParams.set('code', data.code)
       url.searchParams.set('state', state)
-      location.href = url.toString()
+      redirectToApp(params.appId, url.toString())
     }
   }
 
@@ -104,13 +104,13 @@ class OpenIDConnector extends Connector {
     const url = new URL(redirect_uri)
     url.searchParams.set('code', response.code)
     url.searchParams.set('state', response.state as string)
-    location.href = url.toString()
+    redirectToApp(params.appId, url.toString())
   }
 
   override async onCancel(params: IAuthorizeParams, app: IAppDTO): Promise<void> {
     const url = new URL(params.params.redirect_uri)
     url.searchParams.set('error', 'access_denied')
-    location.href = url.toString()
+    redirectToApp(params.appId, url.toString())
   }
 }
 

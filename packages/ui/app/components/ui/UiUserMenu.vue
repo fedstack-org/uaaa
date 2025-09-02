@@ -1,34 +1,47 @@
 <template>
-  <VBtn prepend-icon="mdi-security" class="text-none mr-2" variant="tonal" :color="color">
-    {{
-      dense
-        ? t(`securityLevel.${effectiveToken?.decoded.level}`)
-        : t('msg.current-security-level', [t(`securityLevel.${effectiveToken?.decoded.level}`)])
-    }}
-  </VBtn>
+  <template v-if="isLoggedIn">
+    <VBtn prepend-icon="mdi-security" class="text-none mr-2" variant="tonal" :color="color">
+      {{
+        dense
+          ? t(`securityLevel.${effectiveToken?.decoded.level}`)
+          : t('msg.current-security-level', [t(`securityLevel.${effectiveToken?.decoded.level}`)])
+      }}
+    </VBtn>
 
-  <VMenu>
-    <template v-slot:activator="{ props }">
-      <VBtn
-        v-bind="props"
-        :loading="!username"
-        prepend-icon="mdi-account"
-        class="text-none"
-        variant="tonal"
-        color="info"
-      >
-        <template v-if="dense">
-          {{ t('msg.user-menu') }}
-        </template>
-        <template v-else>
-          {{ username }}
-        </template>
-      </VBtn>
-    </template>
-    <VList>
-      <VListItem v-for="(link, i) of links" :key="i" v-bind="link" :title="t(link.title)" />
-    </VList>
-  </VMenu>
+    <VMenu>
+      <template v-slot:activator="{ props }">
+        <VBtn
+          v-bind="props"
+          :loading="!username"
+          prepend-icon="mdi-account"
+          class="text-none"
+          variant="tonal"
+          color="info"
+        >
+          <template v-if="dense">
+            {{ t('msg.user-menu') }}
+          </template>
+          <template v-else>
+            {{ username }}
+          </template>
+        </VBtn>
+      </template>
+      <VList>
+        <VListItem v-for="(link, i) of links" :key="i" v-bind="link" :title="t(link.title)" />
+      </VList>
+    </VMenu>
+  </template>
+  <template v-else>
+    <VBtn
+      v-if="route.path !== '/auth/signin'"
+      :to="{ path: '/auth/signin', query: { redirect: route.fullPath } }"
+      prepend-icon="mdi-login"
+      class="text-none"
+      variant="tonal"
+      color="info"
+      :text="t('pages.auth.signin')"
+    />
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -38,13 +51,14 @@ defineProps<{
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 
 const links = [
   { to: '/setting', title: 'pages.setting', prependIcon: 'mdi-account-cog-outline' },
   { to: '/auth/signout', title: 'pages.auth.signout', prependIcon: 'mdi-logout' }
 ]
 
-const { effectiveToken, claims } = api
+const { effectiveToken, claims, isLoggedIn } = api
 const username = computed(() => claims.value?.username?.value)
 const color = computed(() => {
   switch (effectiveToken.value?.decoded.level) {

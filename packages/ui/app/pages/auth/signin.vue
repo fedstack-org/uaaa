@@ -91,7 +91,7 @@
               @click="type = loginType"
             />
           </VCardText>
-          <VAlert type="error" :title="t('no-login-methods')" />
+          <VAlert v-else type="error" :title="t('msg.no-login-methods')" />
         </template>
         <VAlert v-else-if="error" type="error" :text="error.message" />
       </VFadeTransition>

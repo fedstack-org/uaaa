@@ -11,6 +11,7 @@ pages:
   authorize: Authorize
   remote-authorize: Remote Authorization
   logout: Sign Out
+  farewell: Upon Next
   auth:
     signin: Sign In
     signout: Sign Out

@@ -14,7 +14,7 @@
 
     <VSpacer></VSpacer>
 
-    <UiUserMenu v-if="showUserMenu" :dense="!mdAndUp" />
+    <UiUserMenu :dense="!mdAndUp" />
     <UiLocaleSelector v-if="!showNavIcon" />
   </VAppBar>
 </template>
@@ -29,5 +29,4 @@ const config = useRuntimeConfig()
 const { mdAndUp } = useDisplay()
 
 const showNavIcon = computed(() => props.mode !== 'authorize' && props.mode !== 'plain')
-const showUserMenu = computed(() => props.mode !== 'plain')
 </script>
