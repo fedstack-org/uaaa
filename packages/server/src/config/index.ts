@@ -16,7 +16,9 @@ const tAppConfig = type({
   'trustedUpstreamIssuers?': 'string[]',
   'openidClaimConfig?': type.Record('string', type({ alias: 'string', 'verifiable?': 'boolean' })),
   'openidAdditionalClaims?': 'Record<string,string>',
-  'uiPath?': 'string'
+  'uiPath?': 'string',
+  'cacheType?': '"mongo" | "redis"',
+  'redisUrl?': 'string'
 })
 
 type IAppConfig = typeof tAppConfig.infer

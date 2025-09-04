@@ -2,6 +2,7 @@ import { Hookable } from 'hookable'
 import type { App } from '../index.js'
 import { CacheImpl } from './_common.js'
 import { MongoCache } from './mongo.js'
+import { RedisCache } from './redis.js'
 
 export interface CacheManager extends Omit<CacheImpl, 'init'> {}
 
@@ -13,7 +14,15 @@ export class CacheManager extends Hookable {
   }
 
   async initCache() {
-    this.impl ??= new MongoCache(this)
+    if (!this.impl) {
+      const cacheType = this.app.config.get('cacheType') || 'mongo'
+      if (cacheType === 'redis') {
+        const redisUrl = this.app.config.get('redisUrl')
+        this.impl = new RedisCache(this, redisUrl)
+      } else {
+        this.impl = new MongoCache(this)
+      }
+    }
     await this.impl.init?.()
     this.set = this.impl.set.bind(this.impl)
     this.setx = this.impl.setx.bind(this.impl)
@@ -37,3 +46,4 @@ export class CacheManager extends Hookable {
 
 export * from './_common.js'
 export * from './mongo.js'
+export * from './redis.js'
