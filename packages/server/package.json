@@ -37,6 +37,7 @@
     "nanoid": "^5.1.5",
     "nodemailer": "^7.0.5",
     "pino": "^9.9.0",
+    "redis": "^5.8.2",
     "totp-generator": "^1.0.0",
     "typanion": "^3.14.0"
   },
