@@ -23,19 +23,19 @@
   "dependencies": {
     "@fastify/http-proxy": "^11.3.0",
     "@fastify/sensible": "^6.0.3",
-    "@hono/node-server": "^1.19.0",
+    "@hono/node-server": "^1.19.1",
     "@uaaa/core": "workspace:^",
-    "arktype": "^2.1.20",
+    "arktype": "^2.1.22",
     "clipanion": "^4.0.0-rc.4",
     "fastify": "^5.5.0",
-    "hono": "^4.9.2",
+    "hono": "^4.9.6",
     "hookable": "^5.5.3",
-    "jose": "^6.0.12",
-    "pino": "^9.9.0",
+    "jose": "^6.1.0",
+    "pino": "^9.9.2",
     "typanion": "^3.14.0"
   },
   "devDependencies": {
-    "concurrently": "^9.2.0",
+    "concurrently": "^9.2.1",
     "typescript": "^5.9.2"
   }
 }
