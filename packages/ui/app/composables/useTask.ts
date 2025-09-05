@@ -12,7 +12,7 @@ export const useTask = <T extends any[], R>(
   const error = ref<unknown>(null)
   const toast = useToast()
   const errToast = useErrorToast()
-  const { t } = useI18n()
+  const { t } = useI18n({ useScope: 'global' })
   const run = async (...args: T) => {
     running.value = true
     error.value = null

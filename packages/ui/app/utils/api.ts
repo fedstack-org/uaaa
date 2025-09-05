@@ -14,6 +14,8 @@ import type { IEmailApi } from '@uaaa/server/lib/plugin/builtin/email'
 import type { ISmsApi } from '@uaaa/server/lib/plugin/builtin/sms'
 import type { IWebauthnApi } from '@uaaa/server/lib/plugin/builtin/webauthn'
 import { hc } from 'hono/client'
+import type { ICandidateClaims } from './candidate'
+import { getCandidateClaims } from './candidate'
 
 export type { SecurityLevel }
 
@@ -21,6 +23,10 @@ export interface IClientToken {
   token: string
   refreshToken?: string
   decoded: ITokenPayload
+}
+
+export interface ICandidateToken extends IClientToken {
+  claims: ICandidateClaims
 }
 
 export interface IUserClaim extends IClaim {
@@ -58,6 +64,7 @@ const options = { serializer }
 
 export class ApiManager {
   tokens
+  candidateTokens
   effectiveToken
   appId
   isLoggedIn
@@ -78,6 +85,11 @@ export class ApiManager {
 
   constructor() {
     this.tokens = useLocalStorage<IClientToken[]>('tokens_v2', [], options)
+    this.candidateTokens = useLocalStorage<Record<string, ICandidateToken>>(
+      'candidate_tokens',
+      {},
+      options
+    )
     this.securityLevel = useLocalStorage<SecurityLevel | -1>('level_v2', -1, options)
     this.effectiveToken = computed<IClientToken | null>(
       () => this.tokens.value[this.securityLevel.value] ?? null
@@ -221,15 +233,55 @@ export class ApiManager {
     await this.getSessionClaims()
   }
 
-  async logout() {
-    console.log(`[API] Will logout`)
+  async deactivateCurrentUser(logout = false) {
+    console.log(`[API] Will deactivate user with logout=${logout}`)
     await navigator.locks.request(`tokens`, async () => {
-      console.log(`[API] Logging out`)
+      console.log(`[API] Switching user`)
+
+      // Preserve current hint token as candidate
+      const hintToken = this.tokens.value[0]
+      if (!logout && hintToken) {
+        const candidateClaims = getCandidateClaims(this.claims.value)
+
+        if (candidateClaims) {
+          const candidateToken: ICandidateToken = { ...hintToken, claims: candidateClaims }
+          // Store candidate token indexed by sub
+          const sub = hintToken.decoded.sub
+          this.candidateTokens.value[sub] = candidateToken
+          console.log(`[API] Preserved hint token as candidate for ${sub}`)
+        }
+      }
+
+      this.securityLevel.value = -1
       this.tokens.value = []
-      this.securityLevel.value = null
       this.claims.value = {}
     })
-    window.open('/', '_self')
+  }
+
+  async logout(redirect = '/') {
+    console.log(`[API] Will logout`)
+    await this.deactivateCurrentUser(true)
+    location.href = redirect
+  }
+
+  async switchToCandidate(sub: string, redirect = '/') {
+    console.log(`[API] Will switch to candidate ${sub}`)
+    await this.deactivateCurrentUser()
+    // Activate the candidate
+    const ok = await navigator.locks.request(`tokens`, async () => {
+      const candidate = this.candidateTokens.value[sub]
+      if (!candidate) return false
+      const { claims, ...clientToken } = candidate
+      this.tokens.value[0] = clientToken
+      this.securityLevel.value = 0
+      this.claims.value = restoreUserClaims(claims)
+      delete this.candidateTokens.value[sub]
+      console.log(`[API] Switched to account ${claims.username}`)
+      return true
+    })
+    if (ok) {
+      location.href = redirect
+    }
   }
 
   async getSessionClaims(): Promise<IUserClaim[]> {

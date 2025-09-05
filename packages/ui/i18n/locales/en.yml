@@ -56,6 +56,7 @@ actions:
   send-otp: Send Verification Code
   goto: Go to {target}
   logout: Sign Out
+  switch-account: Switch Account
 
 msg:
   id: ID
@@ -81,6 +82,8 @@ msg:
   manage-session: Session Management
   tips: Tips
   not-implemented: Feature Not Implemented
+  login-methods: Login Methods
+  verify-methods: Verify Methods
   no-login-methods: No signin methods available
   no-verify-methods: No Verification Methods Available
   no-verify-methods-hint: |
@@ -131,6 +134,7 @@ msg:
   hide-grant: Hide Authorization Details
   current-session: Current Session
   current-user: Current User
+  other-users: Other Users
   confirm-operation: Confirm operation? This operation cannot be undone!
   user-id: User ID
   user-list: User List

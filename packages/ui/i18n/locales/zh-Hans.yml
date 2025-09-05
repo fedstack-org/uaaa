@@ -56,6 +56,7 @@ actions:
   send-otp: 发送验证码
   goto: 转到{target}
   logout: 登出
+  switch-account: 切换账号
 
 msg:
   id: ID
@@ -81,6 +82,8 @@ msg:
   manage-session: 会话管理
   tips: 提示
   not-implemented: 功能尚未实现
+  login-methods: 登录方式
+  verify-methods: 验证方式
   no-login-methods: 没有可用的登录方式
   no-verify-methods: 没有可用的验证方式
   no-verify-methods-hint: |
@@ -131,6 +134,7 @@ msg:
   hide-grant: 隐藏授权细节
   current-session: 当前会话
   current-user: 当前用户
+  other-users: 其他用户
   confirm-operation: 确认进行操作？该操作无法撤销！
   user-id: 用户ID
   user-list: 用户列表
@@ -160,12 +164,6 @@ msg:
   sms-otp-hint: |
     第二步：
     输入短信中收到的数字验证码
-  login-hint: |
-    请您仔细检查页面网址，确保您正在登录正确的网站
-    注意：
-    如果您正在使用公用计算机，请使用远程授权功能
-  verify-hint: |
-    需要进行验证以将安全等级从“{currentLevel}”提升到“{targetLevel}”
 
 claims:
   username: 用户名

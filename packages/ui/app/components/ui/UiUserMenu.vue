@@ -12,7 +12,6 @@
       <template v-slot:activator="{ props }">
         <VBtn
           v-bind="props"
-          :loading="!username"
           prepend-icon="mdi-account"
           class="text-none"
           variant="tonal"
@@ -22,7 +21,7 @@
             {{ t('msg.user-menu') }}
           </template>
           <template v-else>
-            {{ username }}
+            {{ username || t('msg.user-menu') }}
           </template>
         </VBtn>
       </template>

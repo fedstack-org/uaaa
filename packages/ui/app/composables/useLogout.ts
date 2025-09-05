@@ -98,7 +98,7 @@ class OpenIDLogoutConnector extends LogoutConnector {
     params: ILogoutParams,
     beforeRedirect?: () => void
   ) {
-    await api.logout()
+    await api.deactivateCurrentUser()
     if (preLogoutResult.redirect) {
       beforeRedirect?.()
       // FIXME: handle logout state param

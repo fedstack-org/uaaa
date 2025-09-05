@@ -12,11 +12,35 @@
         </div>
       </VCardTitle>
       <VDivider />
-      <VCardText>
-        <VAlert type="success" icon="mdi-check-circle-outline">
-          {{ t('scoped.msg') }}
-        </VAlert>
-      </VCardText>
+
+      <VFadeTransition mode="out-in">
+        <VCardText v-if="actionSelected">
+          <VAlert :type="loggingOut ? 'info' : 'success'">
+            {{ loggingOut ? t('scoped.logging-out') : t('scoped.logged-out') }}
+          </VAlert>
+        </VCardText>
+        <VCardText v-else>
+          <VAlert type="info" variant="tonal" :text="t('scoped.choice-hint')" />
+          <div class="d-flex flex-col space-y-2 mt-4">
+            <VBtn
+              variant="tonal"
+              color="primary"
+              prepend-icon="mdi-account-switch"
+              block
+              :text="t('scoped.switch-account')"
+              to="/auth/switch"
+            />
+            <VBtn
+              variant="tonal"
+              color="error"
+              prepend-icon="mdi-logout"
+              block
+              :text="t('scoped.logout-completely')"
+              @click="onLogout"
+            />
+          </div>
+        </VCardText>
+      </VFadeTransition>
     </VCard>
   </VContainer>
 </template>
@@ -29,21 +53,37 @@ useHead({
   title: 'Sign-Out'
 })
 
-const router = useRouter()
 const { t } = useI18n()
 
-onMounted(() => {
-  setTimeout(async () => {
-    await api.logout()
-  }, 1000)
+const actionSelected = ref(false)
+
+// Delayed logout with UX feedback
+const { run: performLogout, running: loggingOut } = useTask(async () => {
+  // Show logging out message for 1.5 seconds
+  await new Promise((resolve) => setTimeout(resolve, 1500))
+  await api.logout()
+  return symNoToast
 })
+
+function onLogout() {
+  actionSelected.value = true
+  performLogout()
+}
 </script>
 
 <i18n>
 en:
   scoped:
-    msg: You have successfully signed out, redirecting to home page
+    choice-hint: You can switch to another account or sign out completely.
+    switch-account: Switch to another account
+    logout-completely: Sign out completely
+    logging-out: Signing out...
+    logged-out: You have successfully signed out, redirecting to home page
 zh-Hans:
   scoped:
-    msg: 您已成功登出，即将跳转到首页
+    choice-hint: 您可以切换账号，或安全退出。
+    switch-account: 切换账号
+    logout-completely: 安全退出
+    logging-out: 正在退出...
+    logged-out: 您已成功登出，即将跳转到首页
 </i18n>

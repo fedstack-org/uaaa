@@ -31,7 +31,6 @@ const { params } = defineProps<{
 }>()
 
 const { t } = useI18n()
-const router = useRouter()
 const { config } = useTransparentUX()
 
 const { data, status } = await useAsyncData(async () => {

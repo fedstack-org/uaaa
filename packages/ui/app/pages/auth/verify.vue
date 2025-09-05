@@ -8,7 +8,13 @@
         <div class="flex self-stretch items-start">
           <div class="flex-1 flex justify-start">
             <VFadeTransition mode="out-in">
-              <VBtn icon="mdi-arrow-left" size="sm" variant="tonal" color="info" @click="onBack" />
+              <VBtn
+                icon="mdi-arrow-left"
+                size="x-small"
+                variant="tonal"
+                color="info"
+                @click="onBack"
+              />
             </VFadeTransition>
           </div>
           <div class="text-center">
@@ -19,7 +25,29 @@
         </div>
       </VCardTitle>
       <VDivider />
-      <template v-if="data?.allowedTypes.length">
+      <div class="d-flex items-center">
+        <div class="flex-1" />
+        <div class="text-subtitle-2 text-center">{{ t('msg.current-user') }}</div>
+        <div class="flex-1 text-right">
+          <VBtn
+            color="primary"
+            variant="text"
+            size="small"
+            :text="t('actions.switch-account')"
+            @click="onSwitchAccount"
+          />
+        </div>
+      </div>
+      <VList mandatory color="info" class="mx-4 pt-0">
+        <UserListItem
+          active
+          rounded
+          :user-id="effectiveToken?.decoded.sub"
+          :claims="getCandidateClaims(claims)"
+        />
+      </VList>
+      <VDivider />
+      <template v-if="data?.allowedTypes.length && te('msg.verify-hint')">
         <VAlert type="info" rounded="0" variant="tonal" class="whitespace-pre-line">
           {{
             t('msg.verify-hint', {
@@ -31,8 +59,8 @@
         <VDivider />
       </template>
       <template v-if="uiConfig.verifyNotice">
-        <VDivider />
         <VAlert type="warning" rounded="0" variant="tonal" :text="uiConfig.verifyNotice" />
+        <VDivider />
       </template>
       <VFadeTransition mode="out-in">
         <CredentialForm
@@ -93,6 +121,8 @@ const type = useRouteQuery<string>('verify_type', '')
 const currentLevel = api.securityLevel
 const targetLevel = useRouteQuery('targetLevel', '0')
 const { config } = useTransparentUX()
+const { goToSwitchPage } = useAccountSwitch()
+const { effectiveToken, claims } = useAPI()
 const authorizeParams = computed(() => {
   const originalRoute = router.resolve(toSingle(route.query.redirect, '/'))
   if (!originalRoute.path.startsWith('/authorize')) return null
@@ -126,7 +156,7 @@ const { data, error } = await useAsyncData(
 
 watch(
   [data, config],
-  ([data, config], [oldData, oldConfig]) => {
+  ([data, config], [_oldData, oldConfig]) => {
     if (config?.preferType === oldConfig?.preferType) return
     if (data?.allowedTypes.includes(config?.preferType as any)) {
       type.value = config?.preferType as string
@@ -149,6 +179,10 @@ function onBack() {
   } else {
     router.back()
   }
+}
+
+function onSwitchAccount() {
+  goToSwitchPage(route.fullPath)
 }
 
 watch(

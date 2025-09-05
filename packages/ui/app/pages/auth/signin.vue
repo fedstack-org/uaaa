@@ -11,7 +11,7 @@
               <VBtn
                 v-if="type"
                 icon="mdi-arrow-left"
-                size="sm"
+                size="x-small"
                 variant="tonal"
                 color="info"
                 @click="type = ''"
@@ -26,7 +26,7 @@
             <VBtn
               v-if="showRemote && data?.allowRemoteAuthorize"
               icon="mdi-qrcode"
-              size="sm"
+              size="x-small"
               variant="text"
               color="info"
               :disabled="remoteAuthorizeRunning"
@@ -36,20 +36,41 @@
         </div>
       </VCardTitle>
       <VDivider />
-      <VAlert
-        v-if="te('msg.login-hint')"
-        type="info"
-        rounded="0"
-        variant="tonal"
-        class="whitespace-pre-line"
-      >
-        {{ t('msg.login-hint') }}
-      </VAlert>
-      <template v-if="uiConfig.signInNotice">
+
+      <!-- Candidate Accounts Section -->
+      <VFadeTransition mode="out-in">
+        <div v-if="hasCandidates && !type && !isRemote">
+          <div class="text-subtitle-2 text-center mt-2">
+            {{ t('msg.previously-logged-accounts') }}
+          </div>
+          <VList mandatory color="primary" density="compact" class="mx-4 pt-0">
+            <UserListItem
+              v-for="{ sub, claims } in candidateAccounts"
+              :key="sub"
+              :user-id="sub"
+              :claims="claims"
+              :loading="switchRunning && selectedSub === sub"
+              :disabled="switchRunning"
+              @click="onQuickLogin(sub)"
+            />
+          </VList>
+          <VDivider />
+          <div class="text-subtitle-2 text-center mt-2">
+            {{ t('msg.login-other-account') }}
+          </div>
+        </div>
+      </VFadeTransition>
+
+      <template v-if="te('msg.login-hint')">
+        <VAlert type="info" rounded="0" variant="tonal" class="whitespace-pre-line">
+          {{ t('msg.login-hint') }}
+        </VAlert>
         <VDivider />
-        <VAlert type="warning" rounded="0" variant="tonal" :text="uiConfig.signInNotice" />
       </template>
-      <VDivider />
+      <template v-if="uiConfig.signInNotice">
+        <VAlert type="warning" rounded="0" variant="tonal" :text="uiConfig.signInNotice" />
+        <VDivider />
+      </template>
       <VFadeTransition mode="out-in">
         <template v-if="isRemote">
           <VSkeletonLoader type="image" v-if="!userCode" />
@@ -113,6 +134,9 @@ const route = useRoute()
 const router = useRouter()
 const type = useRouteQuery<string>('signin_type', '')
 const { config } = useTransparentUX()
+const { candidateAccounts, hasCandidates, switchAccount, switchRunning } = useAccountSwitch()
+
+const selectedSub = ref<string | null>(null)
 const authorizeParams = computed(() => {
   const originalRoute = router.resolve(toSingle(route.query.redirect, '/'))
   if (!originalRoute.path.startsWith('/authorize')) return null
@@ -148,7 +172,7 @@ const { data, error } = await useAsyncData(
 
 watch(
   [data, config],
-  ([data, config], [oldData, oldConfig]) => {
+  ([data, config], [_oldData, oldConfig]) => {
     if (config?.preferType === oldConfig?.preferType) return
     if (data?.allowedTypes.includes(config?.preferType as any)) {
       type.value = config?.preferType as string
@@ -158,9 +182,26 @@ watch(
 )
 
 function postLogin() {
+  // Invalidate any existing candidate for this user since they've done a fresh login
+  const currentSub = api.effectiveToken.value?.decoded.sub
+  if (currentSub && api.candidateTokens.value[currentSub]) {
+    delete api.candidateTokens.value[currentSub]
+    console.log(`[Login] Invalidated candidate token for ${currentSub} due to fresh login`)
+  }
+  
   const target = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
   console.log(`Login finished, redirecting to ${target}`)
   router.replace(target)
+}
+
+async function onQuickLogin(sub: string) {
+  selectedSub.value = sub
+  try {
+    await switchAccount(sub, typeof route.query.redirect === 'string' ? route.query.redirect : '/')
+  } catch (error) {
+    console.error('Quick login failed:', error)
+    selectedSub.value = null
+  }
 }
 
 const {
@@ -177,3 +218,14 @@ const deviceUrl = new URL('/remote', location.href)
 
 const { data: uiConfig } = useUIConfig()
 </script>
+
+<i18n>
+zh-Hans:
+  msg:
+    previously-logged-accounts: 曾登录的账号
+    login-other-account: 登录其他账号
+en:
+  msg:
+    previously-logged-accounts: Previously logged in accounts
+    login-other-account: Login with other account
+</i18n>
