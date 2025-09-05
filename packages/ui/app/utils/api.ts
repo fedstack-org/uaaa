@@ -14,8 +14,6 @@ import type { IEmailApi } from '@uaaa/server/lib/plugin/builtin/email'
 import type { ISmsApi } from '@uaaa/server/lib/plugin/builtin/sms'
 import type { IWebauthnApi } from '@uaaa/server/lib/plugin/builtin/webauthn'
 import { hc } from 'hono/client'
-import type { ICandidateClaims } from './candidate'
-import { getCandidateClaims } from './candidate'
 
 export type { SecurityLevel }
 
