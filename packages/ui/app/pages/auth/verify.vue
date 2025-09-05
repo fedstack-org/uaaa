@@ -30,6 +30,7 @@
         <div class="text-subtitle-2 text-center">{{ t('msg.current-user') }}</div>
         <div class="flex-1 text-right">
           <VBtn
+            v-if="data?.app"
             color="primary"
             variant="text"
             size="small"
