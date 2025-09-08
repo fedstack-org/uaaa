@@ -79,6 +79,8 @@ export class ApiManager {
   sms
   webauthn
 
+  private isTokenRefreshing: Promise<void> | null = null
+
   constructor() {
     this.tokens = useLocalStorage<IClientToken[]>('tokens_v2', [], options)
     this.candidateTokens = useLocalStorage<Record<string, ICandidateToken>>(
@@ -168,7 +170,18 @@ export class ApiManager {
   }
 
   refreshTokens() {
-    return navigator.locks.request(`tokens`, () => this._refreshTokens())
+    if (this.isTokenRefreshing) {
+      return this.isTokenRefreshing
+    }
+
+    // @ts-expect-error lock.request have typing issues
+    this.isTokenRefreshing = navigator.locks
+      .request(`tokens`, () => this._refreshTokens())
+      .finally(() => {
+        this.isTokenRefreshing = null
+      })
+
+    return this.isTokenRefreshing
   }
 
   private async _downgradeTokenFrom(level: SecurityLevel) {
