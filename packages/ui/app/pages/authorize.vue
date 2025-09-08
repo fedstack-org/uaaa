@@ -5,8 +5,33 @@
         <VIcon size="128">
           <CommonLogo variant="flat" />
         </VIcon>
-        <div>{{ t('pages.authorize') }}</div>
+        <div class="text-center">
+          <div>{{ t('pages.authorize') }}</div>
+          <div v-if="data" class="text-caption">{{ data.name }}</div>
+        </div>
       </VCardTitle>
+      <VDivider />
+      <div class="d-flex items-center">
+        <div class="flex-1" />
+        <div class="text-subtitle-2 text-center">{{ t('msg.current-user') }}</div>
+        <div class="flex-1 text-right">
+          <VBtn
+            color="primary"
+            variant="text"
+            size="small"
+            :text="t('actions.switch-account')"
+            @click="goToSwitchPage()"
+          />
+        </div>
+      </div>
+      <VList mandatory color="info" class="mx-4 pt-0">
+        <UserListItem
+          active
+          rounded
+          :user-id="effectiveToken?.decoded.sub"
+          :claims="getCandidateClaims(claims)"
+        />
+      </VList>
       <VDivider />
       <VAlert
         v-if="'error' in params"
@@ -30,4 +55,8 @@ useHead({
 
 const { t } = useI18n()
 const { params } = useAuthorize()
+const appId = computed(() => ('error' in params.value ? '' : params.value.appId))
+const { data } = useApp(appId)
+const { goToSwitchPage } = useAccountSwitch()
+const { effectiveToken, claims } = useAPI()
 </script>

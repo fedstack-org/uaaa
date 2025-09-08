@@ -1,34 +1,19 @@
 <template>
-  <VSkeletonLoader v-if="status === 'pending'" type="card" />
-  <VAlert v-else-if="status === 'error'" type="error" :text="t('msg.bad-arguments')" />
+  <VSkeletonLoader v-if="appPending || checkPending" type="card" />
+  <VAlert v-else-if="appError || checkError" type="error" :text="t('msg.bad-arguments')" />
   <VAlert v-else-if="!app" type="error" :text="t('msg.app-not-found')" />
   <template v-else>
-    <VList>
-      <VListItem :title="app.name" :subtitle="app.description">
-        <template #prepend>
-          <AppAvatar :appId="app._id" :icon="app.icon" :name="app.name" />
-        </template>
-      </VListItem>
-    </VList>
     <VCardText>
       <VAlert v-if="params.userCode" type="warning" class="whitespace-pre-line">
         {{ t('msg.remote-warn', { code: params.userCode }) }}
       </VAlert>
-      <VAlert v-else :text="t('msg.authorize-warn')" />
+      <VAlert v-else :text="t('msg.authorize-warn', { app: app.name })" />
     </VCardText>
-    <AppGrantEditor v-if="showGrant" :app="app" readonly />
-    <SessionGrantViewer v-else :permissions="grantedPermissions" />
-    <VCardActions class="grid! grid-flow-col grid-auto-cols-[1fr]">
-      <VBtn
-        variant="tonal"
-        color="info"
-        :text="t(`msg.${showGrant ? 'hide' : 'show'}-grant`)"
-        :disabled="running"
-        @click="doShowGrant"
-      />
+    <VCardActions class="d-flex">
       <VBtn
         variant="tonal"
         color="primary"
+        class="flex-1"
         :text="
           timerRunning
             ? t('msg.do-in-seconds', [rest, t('actions.authorize')])
@@ -45,6 +30,40 @@
         @click="cancel"
       />
     </VCardActions>
+    <template v-if="author || showGrant">
+      <VDivider />
+      <div class="d-flex justify-between items-center">
+        <div>
+          <div class="text-caption px-2">{{ author }}</div>
+        </div>
+        <div>
+          <VDialog v-if="showGrant" activator="parent" max-width="800">
+            <template v-slot:activator="{ props }">
+              <VBtn
+                variant="text"
+                size="small"
+                :text="t(`msg.show-grant`)"
+                :disabled="running"
+                v-bind="props"
+              />
+            </template>
+            <template v-slot:default="{ isActive }">
+              <VCard :title="t('msg.grants')">
+                <AppGrantEditor :app="app" readonly />
+                <VCardActions class="justify-end">
+                  <VBtn 
+                    variant="text" 
+                    :text="t('actions.edit', [t('msg.grants')])" 
+                    @click="editGrants"
+                  />
+                  <VBtn variant="text" :text="t('actions.close')" @click="isActive.value = false" />
+                </VCardActions>
+              </VCard>
+            </template>
+          </VDialog>
+        </div>
+      </div>
+    </template>
   </template>
 </template>
 
@@ -58,15 +77,18 @@ const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const { config, silentFail } = useTransparentUX()
-const showGrant = ref(false)
 const grantedPermissions = ref<string[]>([])
 
-const { data: app, status } = await useAsyncData(async () => {
-  const resp = await api.public.app[':id'].$get({ param: { id: props.params.appId } })
-  const { app } = await resp.json()
-  await props.params.connector.preAuthorize(props.params, app)
-  return app
-})
+const { data: app, pending: appPending, error: appError } = useApp(() => props.params.appId)
+const { pending: checkPending, error: checkError } = await useAsyncData(
+  () => `pre-authorize-check-${props.params.type}-${app.value?._id ?? ''}`,
+  async () => {
+    if (!app.value) return
+    await props.params.connector.preAuthorize(props.params, app.value)
+  }
+)
+const author = computed(() => app.value?.variables['meta:author'] ?? '')
+const showGrant = computed(() => app.value?.variables['ui:authorize_show_grant'] !== 'false')
 
 const { run: authorize, running } = useTask(async () => {
   if (!app.value) {
@@ -99,24 +121,17 @@ function cancel() {
   props.params.connector.onCancel(props.params, app.value)
 }
 
-function doShowGrant() {
-  if (api.securityLevel.value < 1) {
-    router.replace({
-      path: '/auth/verify',
-      query: { redirect: route.fullPath, targetLevel: 1 }
-    })
-  } else {
-    showGrant.value = !showGrant.value
-    reset()
-  }
+function editGrants() {
+  router.push({
+    path: '/install',
+    query: {
+      appId: props.params.appId,
+      redirect: route.fullPath
+    }
+  })
 }
 
-const {
-  start,
-  reset,
-  rest,
-  running: timerRunning
-} = useTimer({
+const { rest, running: timerRunning } = useTimer({
   onTimeout: () => authorize()
 })
 

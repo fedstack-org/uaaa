@@ -1,5 +1,6 @@
 export const useAccountSwitch = () => {
   const router = useRouter()
+  const route = useRoute()
 
   const candidateAccounts = computed(() => {
     return Object.entries(api.candidateTokens.value).map(([sub, { claims }]) => ({ sub, claims }))
@@ -14,7 +15,7 @@ export const useAccountSwitch = () => {
     }
   )
 
-  const goToSwitchPage = (redirect?: string) => {
+  const goToSwitchPage = (redirect = route.fullPath) => {
     const query: Record<string, string> = {}
     if (redirect) {
       query.redirect = redirect

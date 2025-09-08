@@ -56,11 +56,7 @@ const toast = useToast()
 const permissions = ref<Record<string, boolean>>({})
 const claims = ref<Record<string, boolean>>({})
 
-const { data: app } = await useAsyncData(async () => {
-  const resp = await api.public.app[':id'].$get({ param: { id: appId.value } })
-  const { app } = await resp.json()
-  return app
-})
+const { data: app } = useApp(appId)
 
 async function install() {
   const resp = await api.user.installation.$put({

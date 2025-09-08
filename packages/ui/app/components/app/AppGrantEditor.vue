@@ -1,5 +1,6 @@
 <template>
-  <div class="flex">
+  <VSkeletonLoader v-if="pending" type="card" />
+  <div v-else class="flex">
     <div class="flex-1">
       <VCardSubtitle class="text-center">{{ t('msg.permissions') }}</VCardSubtitle>
       <div class="px-4">
@@ -63,29 +64,35 @@ const { t } = useI18n()
 const permissions = defineModel<Record<string, boolean>>('permissions', { default: {} })
 const claims = defineModel<Record<string, boolean>>('claims', { default: {} })
 
-const {} = await useAsyncData(async () => {
-  try {
+const { data: installation, pending } = useAsyncData(
+  () => `app-grants-${props.app._id}`,
+  async () => {
     const resp = await api.user.installation[':id'].$get({ param: { id: props.app._id } })
-    if (resp.ok) {
-      const { installation } = await resp.json()
-      permissions.value = Object.fromEntries(installation.grantedPermissions.map((p) => [p, true]))
-      claims.value = Object.fromEntries(installation.grantedClaims.map((c) => [c, true]))
-    }
-  } catch {
-    permissions.value = {}
-    claims.value = {}
+    await api.checkResponse(resp)
+    const { installation } = await resp.json()
+    return installation
   }
-  if (props.fillRequired) {
-    for (const permission of props.app.requestedPermissions) {
-      if (permission.required) {
-        permissions.value[permission.perm] = true
+)
+
+watch(
+  installation,
+  (installation) => {
+    if (!installation) return
+    permissions.value = Object.fromEntries(installation.grantedPermissions.map((p) => [p, true]))
+    claims.value = Object.fromEntries(installation.grantedClaims.map((c) => [c, true]))
+    if (props.fillRequired) {
+      for (const permission of props.app.requestedPermissions) {
+        if (permission.required) {
+          permissions.value[permission.perm] = true
+        }
+      }
+      for (const claim of props.app.requestedClaims) {
+        if (claim.required) {
+          claims.value[claim.name] = true
+        }
       }
     }
-    for (const claim of props.app.requestedClaims) {
-      if (claim.required) {
-        claims.value[claim.name] = true
-      }
-    }
-  }
-})
+  },
+  { immediate: true }
+)
 </script>

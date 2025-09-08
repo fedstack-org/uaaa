@@ -35,7 +35,7 @@
             variant="text"
             size="small"
             :text="t('actions.switch-account')"
-            @click="onSwitchAccount"
+            @click="goToSwitchPage()"
           />
         </div>
       </div>
@@ -180,10 +180,6 @@ function onBack() {
   } else {
     router.back()
   }
-}
-
-function onSwitchAccount() {
-  goToSwitchPage(route.fullPath)
 }
 
 watch(

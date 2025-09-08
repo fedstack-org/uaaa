@@ -1,4 +1,4 @@
-export const useApp = (appId: MaybeRef<string>) => {
+export const useApp = (appId: MaybeRefOrGetter<string>) => {
   const appIdRef = toRef(appId)
   return useAsyncData(
     () => `app-${appIdRef.value}`,

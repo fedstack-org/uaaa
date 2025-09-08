@@ -57,6 +57,7 @@ actions:
   goto: Go to {target}
   logout: Sign Out
   switch-account: Switch Account
+  close: Close
 
 msg:
   id: ID

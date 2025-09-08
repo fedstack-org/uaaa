@@ -8,7 +8,7 @@ pages:
   app: 应用管理
   credential: 凭据管理
   setting: 用户设置
-  authorize: 授权
+  authorize: 用户确认
   remote-authorize: 远程授权
   logout: 登出
   farewell: 即将进入
@@ -49,7 +49,7 @@ actions:
   back: 返回
   add: 添加
   install: 配置
-  authorize: 授权
+  authorize: 进入应用
   terminate: 吊销
   confirm: 确认
   continue: 继续
@@ -57,6 +57,7 @@ actions:
   goto: 转到{target}
   logout: 登出
   switch-account: 切换账号
+  close: 关闭
 
 msg:
   id: ID
@@ -100,7 +101,7 @@ msg:
   manage-app: 应用管理
   app-not-found: 应用不存在
   unsupported-connector: 不支持的授权方式
-  authorize-warn: 点击授权，将赋予该应用您设置的权限，是否继续？
+  authorize-warn: 点击进入应用，以当前用户身份继续使用{app}
   bad-arguments: 参数错误
   app-not-installed: 应用未配置
   redirecting: 正在重定向...
@@ -130,7 +131,7 @@ msg:
   will-grant-permission-for: 将授予下列权限，用途为：
   will-grant-claim-for: 将授予该信息，用途为：
   required: 必选
-  show-grant: 显示授权细节
+  show-grant: 查看权限
   hide-grant: 隐藏授权细节
   current-session: 当前会话
   current-user: 当前用户
