@@ -79,7 +79,7 @@ export class ApiManager {
   sms
   webauthn
 
-  private isTokenRefreshing: Promise<void> | null = null
+  private _currentTask: 'refresh' | 'apply' | null = null
 
   constructor() {
     this.tokens = useLocalStorage<IClientToken[]>('tokens_v2', [], options)
@@ -108,6 +108,18 @@ export class ApiManager {
     this.webauthn = hc<IWebauthnApi>('/api/plugin/webauthn', { headers })
 
     this.isLoggedIn.value && setTimeout(() => this.getSessionClaims().catch(console.error), 0)
+  }
+
+  private async _synchronized(fn: () => Promise<void>, task: 'refresh' | 'apply') {
+    if (this._currentTask) {
+      // Skip refresh if another task is running
+      if (task === 'refresh' && this._currentTask !== 'refresh') return
+    }
+    await navigator.locks.request(`tokens`, async () => {
+      this._currentTask = task
+      await fn()
+      this._currentTask = null
+    })
   }
 
   private async _refreshTokenFor(level: SecurityLevel, now = Date.now()) {
@@ -170,18 +182,7 @@ export class ApiManager {
   }
 
   refreshTokens() {
-    if (this.isTokenRefreshing) {
-      return this.isTokenRefreshing
-    }
-
-    // @ts-expect-error lock.request have typing issues
-    this.isTokenRefreshing = navigator.locks
-      .request(`tokens`, () => this._refreshTokens())
-      .finally(() => {
-        this.isTokenRefreshing = null
-      })
-
-    return this.isTokenRefreshing
+    return this._synchronized(() => this._refreshTokens(), 'refresh')
   }
 
   private async _downgradeTokenFrom(level: SecurityLevel) {
@@ -225,7 +226,7 @@ export class ApiManager {
     const resp = await this.public.login.$post({ json: { type, payload } })
     await this.checkResponse(resp)
     const { token, refreshToken } = await resp.json()
-    await navigator.locks.request(`tokens`, () => this._applyToken(token, refreshToken))
+    await this._synchronized(() => this._applyToken(token, refreshToken), 'apply')
     await this.getSessionClaims()
   }
 
@@ -236,7 +237,7 @@ export class ApiManager {
     const {
       token: { token, refreshToken }
     } = await resp.json()
-    await navigator.locks.request(`tokens`, () => this._applyToken(token, refreshToken))
+    await this._synchronized(() => this._applyToken(token, refreshToken), 'apply')
     await this.getSessionClaims()
   }
 
