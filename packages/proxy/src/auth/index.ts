@@ -9,7 +9,7 @@ export const tOpenIdConfig = type({
   authorization_endpoint: 'string',
   token_endpoint: 'string',
   userinfo_endpoint: 'string',
-  // end_session_endpoint: 'string',
+  'end_session_endpoint?': 'string',
   jwks_uri: 'string',
   response_types_supported: 'string[]',
   subject_types_supported: 'string[]',
@@ -53,13 +53,13 @@ export class AuthManager {
     this._jwks = jose.createRemoteJWKSet(new URL(jwks_uri))
   }
 
-  async verify(jwt: string) {
+  async verify(jwt: string, side: 'server' | 'client' = 'client') {
     if (!this._jwks) {
       throw new Error('AuthManager not initialized')
     }
     const { payload } = await jose.jwtVerify(jwt, this._jwks, {
       issuer: this.issuer,
-      audience: this.serverAppId
+      audience: side === 'client' ? this.serverAppId : this.issuerAppId
     })
     const token = tTokenPayload(payload)
     if (token instanceof type.errors) {

@@ -8,7 +8,7 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
-    "source.organizeImports": "always",
-    "source.sortImports": "always"
+    "source.organizeImports": "explicit",
+    "source.sortImports": "explicit"
   }
 }

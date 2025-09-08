@@ -11,8 +11,8 @@ export default definePlugin({
         return {
           rewriteRequestHeaders: (headers) => ({
             ...headers,
-            'x-user-id': token.sub,
-            'x-client-app-id': token.client_id,
+            'x-user-id': token?.sub,
+            'x-client-app-id': token?.client_id,
             authorization: undefined
           })
         }

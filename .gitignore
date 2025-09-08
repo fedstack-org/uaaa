@@ -131,6 +131,7 @@ dist
 
 /local/**/*
 !/local/.gitkeep
+!/local/example
 
 docs/.vitepress/dist
 docs/.vitepress/cache

@@ -6,6 +6,18 @@ const tAppConfig = type({
   issuer: 'string',
   issuerAppId: 'string',
   serverAppId: 'string',
+  serverAppSecret: 'string',
+  cookieSecret: 'string?',
+  'login?': {
+    required: 'boolean?',
+    permissions: ['string[]', '=', () => ['{{issuer}}/session/claim']],
+    optionalPermissions: ['string[]', '=', () => []],
+    additionalParams: ['Record<string, string>', '=', () => ({})]
+  },
+  'logout?': {
+    skipSingleLogout: 'boolean?',
+    additionalParams: ['Record<string, string>', '=', () => ({})]
+  },
   plugins: 'string[]',
   upstream: 'string',
   adapter: 'string',

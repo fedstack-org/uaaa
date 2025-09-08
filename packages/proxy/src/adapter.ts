@@ -14,6 +14,6 @@ export interface IProxyAdapter {
   getTransform: (
     req: FastifyRequest,
     rep: FastifyReply,
-    token: ITokenPayload
+    token?: ITokenPayload
   ) => Promise<IProxyAdapterTransform>
 }

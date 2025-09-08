@@ -1732,6 +1732,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/cookie@npm:^11.0.2":
+  version: 11.0.2
+  resolution: "@fastify/cookie@npm:11.0.2"
+  dependencies:
+    cookie: "npm:^1.0.0"
+    fastify-plugin: "npm:^5.0.0"
+  checksum: 10/93b651e50e29de83561fe773330005c06111127a46f4e9154f157807b52d95661adce8819dbce7e625c2d2458c000fb0e0d24b3e4862ec26742027995bc55377
+  languageName: node
+  linkType: hard
+
 "@fastify/error@npm:^4.0.0":
   version: 4.1.0
   resolution: "@fastify/error@npm:4.1.0"
@@ -1813,6 +1823,16 @@ __metadata:
     type-is: "npm:^1.6.18"
     vary: "npm:^1.1.2"
   checksum: 10/9d33b5b80e9c70c06eaada587d9bcbad494edb426806304559dd959b02bc1a5b5011a4a47e9457c1116f6c7af0c1490a6dd65c4c7b9ee30157e99db3b9b8fc9c
+  languageName: node
+  linkType: hard
+
+"@fastify/session@npm:^11.1.0":
+  version: 11.1.0
+  resolution: "@fastify/session@npm:11.1.0"
+  dependencies:
+    fastify-plugin: "npm:^5.0.1"
+    safe-stable-stringify: "npm:^2.4.3"
+  checksum: 10/e2087168bb155b2647bf32899af288d36e604c706e026b7198ca4b015a8276829b0817d4b76cb262456ed9ade39280c8e915e97117d6e1aeca4bac2a4fae9846
   languageName: node
   linkType: hard
 
@@ -4806,10 +4826,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@uaaa/proxy@workspace:packages/proxy"
   dependencies:
+    "@fastify/cookie": "npm:^11.0.2"
     "@fastify/http-proxy": "npm:^11.3.0"
     "@fastify/sensible": "npm:^6.0.3"
+    "@fastify/session": "npm:^11.1.0"
     "@hono/node-server": "npm:^1.19.1"
     "@uaaa/core": "workspace:^"
+    "@uaaa/server": "workspace:^"
     arktype: "npm:^2.1.22"
     clipanion: "npm:^4.0.0-rc.4"
     concurrently: "npm:^9.2.1"
@@ -4825,7 +4848,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@uaaa/server@workspace:packages/server":
+"@uaaa/server@workspace:^, @uaaa/server@workspace:packages/server":
   version: 0.0.0-use.local
   resolution: "@uaaa/server@workspace:packages/server"
   dependencies:
@@ -4867,6 +4890,7 @@ __metadata:
     "@nuxtjs/i18n": "npm:^10.0.6"
     "@simplewebauthn/browser": "npm:^13.1.2"
     "@types/whatwg-url": "npm:^13.0.0"
+    "@uaaa/server": "workspace:^"
     "@unocss/nuxt": "npm:^66.5.0"
     "@unocss/reset": "npm:^66.5.0"
     "@vueuse/core": "npm:^13.9.0"
@@ -6667,7 +6691,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie@npm:^1.0.1, cookie@npm:^1.0.2":
+"cookie@npm:^1.0.0, cookie@npm:^1.0.1, cookie@npm:^1.0.2":
   version: 1.0.2
   resolution: "cookie@npm:1.0.2"
   checksum: 10/f5817cdc84d8977761b12549eba29435e675e65c7fef172bc31737788cd8adc83796bf8abe6d950554e7987325ad2d9ac2971c5bd8ff0c4f81c145f82e4ab1be
@@ -12041,7 +12065,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"safe-stable-stringify@npm:^2.3.1":
+"safe-stable-stringify@npm:^2.3.1, safe-stable-stringify@npm:^2.4.3":
   version: 2.5.0
   resolution: "safe-stable-stringify@npm:2.5.0"
   checksum: 10/2697fa186c17c38c3ca5309637b4ac6de2f1c3d282da27cd5e1e3c88eca0fb1f9aea568a6aabdf284111592c8782b94ee07176f17126031be72ab1313ed46c5c

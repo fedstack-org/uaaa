@@ -10,6 +10,18 @@ import { tRemoteRequest, type RemoteRequest } from '../session/index.js'
 import { Permission, rAppId, safeCompare } from '../util/index.js'
 import { OAuthError } from './_errors.js'
 
+export interface IOAuthWellKnownMetadata {
+  issuer: string
+  authorization_endpoint: string
+  token_endpoint: string
+  end_session_endpoint: string
+  jwks_uri: string
+  userinfo_endpoint: string
+  response_types_supported: ['code', 'id_token']
+  subject_types_supported: ['public']
+  id_token_signing_alg_values_supported: ['RS256']
+}
+
 export interface IOAuthTokenResponse {
   access_token: string
   token_type: string
@@ -248,7 +260,7 @@ export class OAuthManager {
     return this._relativeUrl('/logout?' + new URLSearchParams(...params).toString())
   }
 
-  async getMetadata() {
+  async getMetadata(): Promise<IOAuthWellKnownMetadata> {
     return {
       issuer: this._base,
       authorization_endpoint: this._relativeUrl('/oauth/authorize'),

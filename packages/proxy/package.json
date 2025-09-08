@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "concurrently yarn:build:watch yarn:dev:server",
-    "dev:server": "node --watch ./lib/cli/index.js serve --config ../../local/config_proxy.json",
+    "dev:server": "node --watch ./lib/cli/index.js serve --config ../../local/config.proxy.json",
     "build": "tsc",
     "build:watch": "tsc -w",
     "prepack": "run build"
@@ -21,8 +21,10 @@
     "uaaa-proxy": "lib/cli/index.js"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/http-proxy": "^11.3.0",
     "@fastify/sensible": "^6.0.3",
+    "@fastify/session": "^11.1.0",
     "@hono/node-server": "^1.19.1",
     "@uaaa/core": "workspace:^",
     "arktype": "^2.1.22",
@@ -35,6 +37,7 @@
     "typanion": "^3.14.0"
   },
   "devDependencies": {
+    "@uaaa/server": "workspace:^",
     "concurrently": "^9.2.1",
     "typescript": "^5.9.2"
   }

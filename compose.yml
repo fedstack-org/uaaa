@@ -19,3 +19,10 @@ services:
       dockerfile: Dockerfile
       target: ui
     image: git.pku.edu.cn/uaaa/ui:${TAG:-latest}
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: proxy
+    image: git.pku.edu.cn/uaaa/proxy:${TAG:-latest}

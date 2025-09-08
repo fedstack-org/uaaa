@@ -67,8 +67,6 @@ export class ApiManager {
   appId
   isLoggedIn
   securityLevel
-  refreshTokensDebounced
-  tokensInit
   claims
   isAdmin
 
@@ -94,11 +92,6 @@ export class ApiManager {
     )
     this.appId = computed(() => this.effectiveToken.value?.decoded.client_id ?? '')
     this.isLoggedIn = computed(() => this.securityLevel.value !== -1)
-    this.refreshTokensDebounced = useDebounceFn(
-      () => navigator.locks.request(`tokens`, this._refreshTokens.bind(this)),
-      1000
-    )
-    this.tokensInit = navigator.locks.request(`tokens`, this._refreshTokens.bind(this))
     this.claims = useLocalStorage<Partial<IUserClaims>>('session_claims', {}, options)
     this.isAdmin = computed(() => this.claims.value.is_admin?.value === 'true')
 
@@ -174,6 +167,10 @@ export class ApiManager {
     console.groupEnd()
   }
 
+  refreshTokens() {
+    return navigator.locks.request(`tokens`, () => this._refreshTokens())
+  }
+
   private async _downgradeTokenFrom(level: SecurityLevel) {
     console.log(`[API] Downgrading token to level ${level}`)
     try {
@@ -204,8 +201,7 @@ export class ApiManager {
   }
 
   async getHeaders() {
-    await this.tokensInit
-    this.refreshTokensDebounced()
+    await this.refreshTokens()
     const headers: Record<string, string> = Object.create(null)
     const token = this.effectiveToken.value
     if (token) headers.Authorization = `Bearer ${token.token}`
