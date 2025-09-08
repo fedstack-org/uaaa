@@ -89,9 +89,10 @@ const { data: installation, pending } = useAsyncData(
 watch(
   installation,
   (installation) => {
-    if (!installation) return
-    permissions.value = Object.fromEntries(installation.grantedPermissions.map((p) => [p, true]))
-    claims.value = Object.fromEntries(installation.grantedClaims.map((c) => [c, true]))
+    if (installation) {
+      permissions.value = Object.fromEntries(installation.grantedPermissions.map((p) => [p, true]))
+      claims.value = Object.fromEntries(installation.grantedClaims.map((c) => [c, true]))
+    }
     if (props.fillRequired) {
       for (const permission of props.app.requestedPermissions) {
         if (permission.required) {
