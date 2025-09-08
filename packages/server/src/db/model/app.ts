@@ -38,7 +38,6 @@ export const tAppOpenIdConfig = type({
   'additionalClaims?': 'Record<string,string>',
   'allowPublicClient?': 'boolean',
   'defaultPublicClient?': 'boolean',
-  'minSecurityLevel?': tSecurityLevel,
   'logoutUrls?': 'string[]'
 })
 export type IAppOpenIdConfig = typeof tAppOpenIdConfig.infer
@@ -70,7 +69,8 @@ export const tAppManifest = type({
   'config?': tAppGeneralConfig,
   'openid?': tAppOpenIdConfig,
   'delegation?': tDelegationConfig,
-  securityLevel: tSecurityLevel
+  securityLevel: tSecurityLevel,
+  'baseSecurityLevel?': tSecurityLevel
 }).narrow((manifest) => manifest.version === manifest.changelog.length)
 
 export type IAppManifest = typeof tAppManifest.infer

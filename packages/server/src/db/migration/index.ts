@@ -5,7 +5,7 @@ import { promisify } from 'node:util'
 import { logger, wait } from '../../util/index.js'
 import type { DbManager } from '../index.js'
 
-export const databaseVersion = 3
+export const databaseVersion = 4
 
 export interface IMigrationImpl {
   (this: MigrationManager): Promise<void>
@@ -75,6 +75,24 @@ export class MigrationManager extends Hookable<{
       )
 
       await this.db.setSystemConfig('version', 3)
+    })
+
+    this.migrations.set(3, async function () {
+      // Migrate openid.minSecurityLevel to baseSecurityLevel using aggregation pipeline
+      await this.db.apps.updateMany({}, [
+        {
+          $set: {
+            baseSecurityLevel: {
+              $ifNull: ['$openid.minSecurityLevel', 1]
+            }
+          }
+        }
+      ])
+
+      // Remove the old minSecurityLevel field
+      await this.db.apps.updateMany({}, { $unset: { 'openid.minSecurityLevel': '' } })
+
+      await this.db.setSystemConfig('version', 4)
     })
   }
 

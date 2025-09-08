@@ -63,14 +63,26 @@ const { t } = useI18n()
 
 const permissions = defineModel<Record<string, boolean>>('permissions', { default: {} })
 const claims = defineModel<Record<string, boolean>>('claims', { default: {} })
+const { toVerify } = useRedirect()
 
 const { data: installation, pending } = useAsyncData(
   () => `app-grants-${props.app._id}`,
   async () => {
-    const resp = await api.user.installation[':id'].$get({ param: { id: props.app._id } })
-    await api.checkResponse(resp)
-    const { installation } = await resp.json()
-    return installation
+    try {
+      const resp = await api.user.installation[':id'].$get({ param: { id: props.app._id } })
+      await api.checkResponse(resp)
+      const { installation } = await resp.json()
+      return installation
+    } catch (err) {
+      if (isAPIError(err)) {
+        switch (err.code) {
+          case 'INSUFFICIENT_SECURITY_LEVEL': {
+            toVerify(err.data.required)
+          }
+        }
+      }
+      throw err
+    }
   }
 )
 

@@ -1,7 +1,7 @@
 import { arktypeValidator } from '@hono/arktype-validator'
-import { Hono } from 'hono'
 import { type } from 'arktype'
-import type { IInstallationDoc, IAppDoc } from '../../db/index.js'
+import { Hono } from 'hono'
+import type { IAppDoc, IInstallationDoc } from '../../db/index.js'
 import { BusinessError } from '../../util/errors.js'
 import { idParamValidator } from '../_common.js'
 import { verifyPermission } from '../_middleware.js'
@@ -18,6 +18,7 @@ export const userInstallationApi = new Hono()
         { $match: { userId: token.sub } },
         { $lookup: { from: 'apps', localField: 'appId', foreignField: '_id', as: 'app' } },
         { $unwind: '$app' },
+        { $match: { 'app.baseSecurityLevel': { $lte: token.level }, 'app.disabled': { $ne: true } } },
         {
           $project: {
             appId: 1,
@@ -48,7 +49,11 @@ export const userInstallationApi = new Hono()
     async (ctx) => {
       const { app, token } = ctx.var
       const { appId, ...req } = ctx.req.valid('json')
-      const clientApp = await app.db.apps.findOne({ _id: appId, disabled: { $ne: true } })
+      const clientApp = await app.db.apps.findOne({
+        _id: appId,
+        baseSecurityLevel: { $lte: token.level },
+        disabled: { $ne: true }
+      })
       const user = await app.db.users.findOne({ _id: token.sub })
       if (!clientApp || !user) throw new BusinessError('NOT_FOUND', { msg: 'App not found' })
       if (clientApp.disabled) {
@@ -98,6 +103,15 @@ export const userInstallationApi = new Hono()
   .get('/:id', verifyPermission({ path: '/user/installation' }), idParamValidator, async (ctx) => {
     const { id } = ctx.req.valid('param')
     const { app, token } = ctx.var
+
+    // Check if app exists and user has sufficient security level
+    const clientApp = await app.db.apps.findOne({
+      _id: id,
+      baseSecurityLevel: { $lte: token.level },
+      disabled: { $ne: true }
+    })
+    if (!clientApp) throw new BusinessError('NOT_FOUND', { msg: 'App not found' })
+
     const installation = await app.db.installations.findOne({ appId: id, userId: token.sub })
     if (!installation) throw new BusinessError('NOT_FOUND', { msg: 'Installation not found' })
     return ctx.json({ installation })
@@ -109,7 +123,12 @@ export const userInstallationApi = new Hono()
     async (ctx) => {
       const { id } = ctx.req.valid('param')
       const { app, token } = ctx.var
-      if (!(await app.db.apps.findOne({ _id: id, disabled: { $ne: true } }))) {
+      const clientApp = await app.db.apps.findOne({
+        _id: id,
+        disabled: { $ne: true },
+        baseSecurityLevel: { $lte: token.level }
+      })
+      if (!clientApp) {
         throw new BusinessError('INVALID_OPERATION', {})
       }
       await app.db.installations.updateOne(
@@ -126,6 +145,15 @@ export const userInstallationApi = new Hono()
     async (ctx) => {
       const { id } = ctx.req.valid('param')
       const { app, token } = ctx.var
+
+      // Check if app exists and user has sufficient security level
+      const clientApp = await app.db.apps.findOne({
+        _id: id,
+        baseSecurityLevel: { $lte: token.level },
+        disabled: { $ne: true }
+      })
+      if (!clientApp) throw new BusinessError('NOT_FOUND', { msg: 'App not found' })
+
       await app.db.tokens.updateMany(
         { appId: id, userId: token.sub },
         { $set: { terminated: true } }
@@ -144,6 +172,15 @@ export const userInstallationApi = new Hono()
     async (ctx) => {
       const { id } = ctx.req.valid('param')
       const { app, token } = ctx.var
+
+      // Check if app exists and user has sufficient security level
+      const clientApp = await app.db.apps.findOne({
+        _id: id,
+        baseSecurityLevel: { $lte: token.level },
+        disabled: { $ne: true }
+      })
+      if (!clientApp) throw new BusinessError('NOT_FOUND', { msg: 'App not found' })
+
       await app.db.installations.deleteOne({ appId: id, userId: token.sub, disabled: true })
       return ctx.json({})
     }

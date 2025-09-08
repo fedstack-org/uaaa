@@ -40,7 +40,8 @@
 
 <script setup lang="ts">
 definePageMeta({
-  level: 2
+  level: 2,
+  layout: 'authorize'
 })
 
 useHead({

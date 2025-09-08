@@ -325,7 +325,7 @@ export class OAuthManager {
     }
     const securityLevel =
       this._checkSecurityLevel('security_level' in rest && rest.security_level) ??
-      this._checkSecurityLevel(clientApp.openid?.minSecurityLevel) ??
+      this._checkSecurityLevel(clientApp.baseSecurityLevel) ??
       '1'
     const confidential =
       'confidential' in rest && clientApp.openid?.allowPublicClient
@@ -529,7 +529,7 @@ export class OAuthManager {
     const interval = Math.floor(this._devicePollInterval / 1000)
     const securityLevel =
       this._checkSecurityLevel('security_level' in rest && rest.security_level) ??
-      this._checkSecurityLevel(clientApp.openid?.minSecurityLevel) ??
+      this._checkSecurityLevel(clientApp.baseSecurityLevel) ??
       '1'
 
     const remoteRequest: RemoteRequest = {

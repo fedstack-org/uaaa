@@ -25,8 +25,8 @@ callbackUrls:
 variables: {}
 secrets: {}
 securityLevel: 1
+baseSecurityLevel: 1
 openid:
   allowPublicClient: false
-  minSecurityLevel: 1
 config:
   autoInstall: true
