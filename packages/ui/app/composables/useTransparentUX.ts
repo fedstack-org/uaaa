@@ -2,10 +2,10 @@ import { type } from 'arktype'
 
 const tTransparentUXConfig = type({
   preferType: 'string?',
-  nonInteractive: 'boolean?',
+  nonInteractive: 'string.json.parse?',
   preAuthType: 'string?',
   preAuthPayload: 'unknown?'
-})
+}).onDeepUndeclaredKey('delete')
 
 export const useTransparentUX = () => {
   const router = useRouter()
