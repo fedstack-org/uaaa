@@ -18,11 +18,12 @@ export const useTransparentUX = () => {
   const resolveConfig = () => {
     let params = route.query.params
     switch (route.path) {
-      case '/login':
-      case '/verify':
+      case '/auth/signin':
+      case '/auth/verify':
         if (route.query.redirect && typeof route.query.redirect === 'string') {
           params = router.resolve(route.query.redirect).query.params
         }
+      case '/logout':
       case '/authorize':
         return parseTransparentUXConfig(params)
     }
