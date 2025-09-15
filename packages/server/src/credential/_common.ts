@@ -47,9 +47,7 @@ export interface ICredentialBindInfo {
   securityLevel: SecurityLevel
 }
 
-export interface ICredentialLoginResult {
-  /** User ID */
-  userId: string
+export interface ICredentialVerifyResult {
   /** Used Credential ID */
   credentialId: string
   /** Session Security Level */
@@ -61,12 +59,9 @@ export interface ICredentialLoginResult {
   refreshTimeout?: number
 }
 
-export interface ICredentialVerifyResult {
-  credentialId: string
-  securityLevel: SecurityLevel
-  expiresIn?: number
-  tokenTimeout?: number
-  refreshTimeout?: number
+export interface ICredentialLoginResult extends ICredentialVerifyResult {
+  /** User ID */
+  userId: string
 }
 
 export interface ICredentialBindResult {

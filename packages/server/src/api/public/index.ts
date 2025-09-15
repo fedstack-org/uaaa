@@ -98,6 +98,7 @@ export const publicApi = new Hono()
       const { type, payload } = ctx.req.valid('json')
       const { credential, session } = ctx.var.app
       const loginResult = await credential.handleLogin(ctx, type, payload)
+      // TODO: support candidate sessions
       const environment = {
         ip: getRemoteIP(ctx),
         ua: getUserAgent(ctx)
