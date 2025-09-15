@@ -4,7 +4,7 @@ const tTransparentUXConfig = type({
   preferType: 'string?',
   nonInteractive: 'string.json.parse?',
   preAuthType: 'string?',
-  preAuthPayload: 'unknown?'
+  preAuthPayload: 'string.json.parse?'
 }).onDeepUndeclaredKey('delete')
 
 export const useTransparentUX = () => {
