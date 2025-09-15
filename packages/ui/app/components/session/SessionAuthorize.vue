@@ -51,9 +51,9 @@
               <VCard :title="t('msg.grants')">
                 <AppGrantEditor :app="app" readonly />
                 <VCardActions class="justify-end">
-                  <VBtn 
-                    variant="text" 
-                    :text="t('actions.edit', [t('msg.grants')])" 
+                  <VBtn
+                    variant="text"
+                    :text="t('actions.edit', [t('msg.grants')])"
                     @click="editGrants"
                   />
                   <VBtn variant="text" :text="t('actions.close')" @click="isActive.value = false" />
@@ -135,7 +135,7 @@ const { rest, running: timerRunning } = useTimer({
   onTimeout: () => authorize()
 })
 
-onMounted(async () => {
+const tryAuthorize = async () => {
   try {
     const resp = await api.session.try_derive.$post({
       json: {
@@ -184,5 +184,15 @@ onMounted(async () => {
     }
     return
   }
-})
+}
+
+const stopAppWatcher = watch(
+  app,
+  (app) => {
+    if (!app) return
+    stopAppWatcher()
+    tryAuthorize()
+  },
+  { immediate: true }
+)
 </script>

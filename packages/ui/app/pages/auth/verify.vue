@@ -69,7 +69,7 @@
           action="verify"
           :type="type"
           :target-level="+targetLevel"
-          @updated="onUpdated"
+          @updated="postVerify"
         />
         <template v-else-if="data">
           <VCardText class="flex flex-col gap-2" v-if="data.allowedTypes.length">
@@ -155,12 +155,32 @@ const { data, error } = await useAsyncData(
   }
 )
 
+const { status } = await useAsyncData(
+  () =>
+    `verify-preauth-${config.value.preAuthType}-${btoa(JSON.stringify(config.value.preAuthPayload))}`,
+  async () => {
+    if (!config.value.preAuthType || !config.value.preAuthPayload)
+      throw new Error('PreAuth Skipped')
+    await api.verify(
+      config.value.preAuthType,
+      +targetLevel.value as SecurityLevel,
+      config.value.preAuthPayload
+    )
+  }
+)
+
 watch(
-  [data, config],
-  ([data, config], [_oldData, oldConfig]) => {
-    if (config?.preferType === oldConfig?.preferType) return
-    if (data?.allowedTypes.includes(config?.preferType as any)) {
-      type.value = config?.preferType as string
+  [data, config, status],
+  ([data, config, status]) => {
+    switch (status) {
+      case 'error':
+        if (data?.allowedTypes.includes(config?.preferType as any)) {
+          type.value = config?.preferType as string
+        }
+        break
+      case 'success':
+        postVerify()
+        break
     }
   },
   { immediate: true }
@@ -168,7 +188,7 @@ watch(
 
 let redirected = false
 
-function onUpdated() {
+function postVerify() {
   if (redirected) return
   redirected = true
   router.replace(typeof route.query.redirect === 'string' ? route.query.redirect : '/')
@@ -186,9 +206,10 @@ watch(
   () => api.effectiveToken.value?.decoded.level,
   (level) => {
     if ((level ?? 0) >= +targetLevel) {
-      onUpdated()
+      postVerify()
     }
-  }
+  },
+  { immediate: true }
 )
 
 const { data: uiConfig } = useUIConfig()

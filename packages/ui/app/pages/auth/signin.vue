@@ -170,12 +170,28 @@ const { data, error } = await useAsyncData(
   }
 )
 
+const { status } = await useAsyncData(
+  () =>
+    `login-preauth-${config.value.preAuthType}-${btoa(JSON.stringify(config.value.preAuthPayload))}`,
+  async () => {
+    if (!config.value.preAuthType || !config.value.preAuthPayload)
+      throw new Error('PreAuth Skipped')
+    await api.login(config.value.preAuthType, config.value.preAuthPayload)
+  }
+)
+
 watch(
-  [data, config],
-  ([data, config], [_oldData, oldConfig]) => {
-    if (config?.preferType === oldConfig?.preferType) return
-    if (data?.allowedTypes.includes(config?.preferType as any)) {
-      type.value = config?.preferType as string
+  [data, config, status],
+  ([data, config, status]) => {
+    switch (status) {
+      case 'error':
+        if (data?.allowedTypes.includes(config?.preferType as any)) {
+          type.value = config?.preferType as string
+        }
+        break
+      case 'success':
+        postLogin()
+        break
     }
   },
   { immediate: true }
@@ -188,7 +204,7 @@ function postLogin() {
     delete api.candidateTokens.value[currentSub]
     console.log(`[Login] Invalidated candidate token for ${currentSub} due to fresh login`)
   }
-  
+
   const target = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
   console.log(`Login finished, redirecting to ${target}`)
   router.replace(target)

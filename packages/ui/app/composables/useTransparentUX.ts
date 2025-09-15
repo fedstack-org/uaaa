@@ -1,35 +1,35 @@
-import type { LocationQuery } from '#vue-router'
+import { type } from 'arktype'
 
-export interface ITransparentUXConfig {
-  preferType?: string
-  nonInteractive?: boolean
-}
+const tTransparentUXConfig = type({
+  preferType: 'string?',
+  nonInteractive: 'boolean?',
+  preAuthType: 'string?',
+  preAuthPayload: 'unknown?'
+})
 
 export const useTransparentUX = () => {
   const router = useRouter()
   const route = useRoute()
 
-  const parseTransparentUXConfig = (query: LocationQuery) => {
-    const config: ITransparentUXConfig = {}
-    if (query.preferType) {
-      config.preferType = toSingle(query.preferType, '')
+  const parseTransparentUXConfig = (params: unknown) => {
+    const parsed = type('string.json.parse').to(tTransparentUXConfig)(params)
+    return parsed instanceof type.errors ? {} : parsed
+  }
+  const resolveConfig = () => {
+    let params = route.query.params
+    switch (route.path) {
+      case '/login':
+      case '/verify':
+        if (route.query.redirect && typeof route.query.redirect === 'string') {
+          params = router.resolve(route.query.redirect).query.params
+        }
+      case '/authorize':
+        return parseTransparentUXConfig(params)
     }
-    if (query.nonInteractive) {
-      config.nonInteractive = ['1', 'true'].includes(toSingle(query.nonInteractive, '1'))
-    }
-    if (query.params) {
-      try {
-        Object.assign(config, parseTransparentUXConfig(JSON.parse(toSingle(query.params, '{}'))))
-      } catch {}
-    }
-    if (query.redirect) {
-      const originalRoute = router.resolve(toSingle(query.redirect, '/'))
-      Object.assign(config, parseTransparentUXConfig(originalRoute.query))
-    }
-    return config
+    return {}
   }
 
-  const config = computed(() => parseTransparentUXConfig(route.query))
+  const config = computed(() => resolveConfig())
 
   const silentFail = () => {
     history.go(1 - history.length)

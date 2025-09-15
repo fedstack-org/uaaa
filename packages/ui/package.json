@@ -28,6 +28,7 @@
     "@vueuse/core": "^13.9.0",
     "@vueuse/nuxt": "^13.9.0",
     "@vueuse/router": "^13.7.0",
+    "arktype": "^2.1.22",
     "confbox": "^0.2.2",
     "copy-to-clipboard": "^3.3.3",
     "hono": "^4.9.6",

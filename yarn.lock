@@ -4896,6 +4896,7 @@ __metadata:
     "@vueuse/core": "npm:^13.9.0"
     "@vueuse/nuxt": "npm:^13.9.0"
     "@vueuse/router": "npm:^13.7.0"
+    arktype: "npm:^2.1.22"
     confbox: "npm:^0.2.2"
     copy-to-clipboard: "npm:^3.3.3"
     hono: "npm:^4.9.6"
