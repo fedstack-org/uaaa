@@ -317,7 +317,7 @@ export class SessionManager extends Hookable<{
       },
       { timestamp: now }
     )
-    return { token: newToken }
+    return newToken
   }
 
   /**

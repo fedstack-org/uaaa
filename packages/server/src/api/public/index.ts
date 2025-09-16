@@ -93,15 +93,33 @@ export const publicApi = new Hono()
   // Login
   .post(
     '/login',
-    arktypeValidator('json', type({ type: 'string', payload: 'unknown' })),
+    arktypeValidator(
+      'json',
+      type({
+        type: 'string',
+        payload: 'unknown',
+        candidateTokens: 'string[]?'
+      })
+    ),
     async (ctx) => {
-      const { type, payload } = ctx.req.valid('json')
-      const { credential, session } = ctx.var.app
+      const { type, payload, candidateTokens = [] } = ctx.req.valid('json')
+      const { credential, session, token } = ctx.var.app
       const loginResult = await credential.handleLogin(ctx, type, payload)
-      // TODO: support candidate sessions
       const environment = {
         ip: getRemoteIP(ctx),
         ua: getUserAgent(ctx)
+      }
+      for (const candidate of candidateTokens) {
+        try {
+          const { jwt, payload } = await token.verifyUAAAToken(candidate)
+          if (loginResult.userId === payload.sub) {
+            ctx.set('jwt', jwt)
+            ctx.set('token', payload)
+            return ctx.json(await session.upgrade(payload, loginResult, environment))
+          }
+        } catch {
+          // Intentionally ignore errors from invalid candidate tokens
+        }
       }
       return ctx.json(await session.login(loginResult, environment))
     }

@@ -108,6 +108,8 @@ export class ApiManager {
     this.webauthn = hc<IWebauthnApi>('/api/plugin/webauthn', { headers })
 
     this.isLoggedIn.value && setTimeout(() => this.getSessionClaims().catch(console.error), 0)
+
+    this.refreshCandidateTokens()
   }
 
   private async _synchronized(fn: () => Promise<void>, task: 'refresh' | 'apply') {
@@ -122,6 +124,25 @@ export class ApiManager {
     })
   }
 
+  private async _performTokenRefresh(refreshToken: string, clientAppId: string) {
+    try {
+      const resp = await this.public.refresh.$post({
+        json: { clientAppId, refreshToken }
+      })
+      await this.checkResponse(resp)
+      const data = await resp.json()
+      return data
+    } catch (err) {
+      if (isAPIError(err) && err.code === 'TOKEN_INVALID_REFRESH') {
+        console.log(`[API] Token failed to refresh: invalid refreshToken`)
+        return false
+      } else {
+        console.log(`[API] Token failed to refresh: ${this._formatError(err)}`)
+      }
+      return null
+    }
+  }
+
   private async _refreshTokenFor(level: SecurityLevel, now = Date.now()) {
     const token = this.tokens.value[level]
     if (!token) return
@@ -130,28 +151,20 @@ export class ApiManager {
     if (remaining > lifetime / 2) return
     console.log(`[API] Refreshing token at level ${level}`)
     if (token.refreshToken) {
-      try {
-        const resp = await this.public.refresh.$post({
-          json: { clientAppId: this.appId.value, refreshToken: token.refreshToken }
-        })
-        await this.checkResponse(resp)
-        const { token: newToken, refreshToken } = await resp.json()
+      const refreshResult = await this._performTokenRefresh(token.refreshToken, this.appId.value)
+      if (refreshResult) {
         this.tokens.value[level] = {
-          token: newToken,
-          refreshToken,
-          decoded: ApiManager.parseJwt(newToken)
+          token: refreshResult.token,
+          refreshToken: refreshResult.refreshToken,
+          decoded: ApiManager.parseJwt(refreshResult.token)
         }
         console.log(`[API] Token at level ${level} refreshed`)
         return
-      } catch (err) {
-        if (isAPIError(err) && err.code === 'TOKEN_INVALID_REFRESH') {
-          delete this.tokens.value[level]!.refreshToken
-          console.log(`[API] Token ${level} failed to refresh: invalid refreshToken`)
-        } else {
-          console.log(`[API] Token ${level} failed to refresh: ${this._formatError(err)}`)
-        }
+      } else if (refreshResult === false) {
+        delete token.refreshToken
       }
     }
+
     // Token not refreshed, check if it is expired
     if (remaining < 3 * 1000) {
       console.log(`[API] Token at level ${level} dropped remaining=${remaining}ms`)
@@ -183,6 +196,48 @@ export class ApiManager {
 
   refreshTokens() {
     return this._synchronized(() => this._refreshTokens(), 'refresh')
+  }
+
+  async refreshCandidateTokens() {
+    const now = Date.now()
+    console.log(`[API] Refreshing candidate tokens at ${now}`)
+    await navigator.locks.request(`candidate_tokens`, async () => {
+      const candidateEntries = Object.entries(this.candidateTokens.value)
+
+      for (const [sub, candidateToken] of candidateEntries) {
+        const { refreshToken, decoded } = candidateToken
+        const remaining = decoded.exp * 1000 - now
+        const lifetime = (decoded.exp - decoded.iat) * 1000
+
+        // Skip if token doesn't need refresh yet
+        if (remaining > lifetime / 2) continue
+
+        console.log(`[API] Refreshing candidate token for ${sub}`)
+
+        if (refreshToken) {
+          const refreshResult = await this._performTokenRefresh(refreshToken, decoded.client_id)
+          if (refreshResult) {
+            this.candidateTokens.value[sub] = {
+              ...candidateToken,
+              token: refreshResult.token,
+              refreshToken: refreshResult.refreshToken,
+              decoded: ApiManager.parseJwt(refreshResult.token)
+            }
+            console.log(`[API] Candidate token for ${sub} refreshed`)
+            continue
+          } else {
+            // Remove invalid refresh token
+            delete candidateToken.refreshToken
+          }
+        }
+
+        // Token not refreshed, check if it is expired
+        if (remaining < 3 * 1000) {
+          console.log(`[API] Candidate token for ${sub} dropped remaining=${remaining}ms`)
+          delete this.candidateTokens.value[sub]
+        }
+      }
+    })
   }
 
   private async _downgradeTokenFrom(level: SecurityLevel) {
@@ -223,7 +278,14 @@ export class ApiManager {
   }
 
   async login(type: string, payload: unknown) {
-    const resp = await this.public.login.$post({ json: { type, payload } })
+    await this.refreshCandidateTokens()
+    const resp = await this.public.login.$post({
+      json: {
+        type,
+        payload,
+        candidateTokens: Object.values(this.candidateTokens.value).map((t) => t.token)
+      }
+    })
     await this.checkResponse(resp)
     const { token, refreshToken } = await resp.json()
     await this._synchronized(() => this._applyToken(token, refreshToken), 'apply')
@@ -234,9 +296,7 @@ export class ApiManager {
     console.log(`[API] Will verify credential ${type}`)
     const resp = await this.session.upgrade.$post({ json: { type, targetLevel, payload } })
     await this.checkResponse(resp)
-    const {
-      token: { token, refreshToken }
-    } = await resp.json()
+    const { token, refreshToken } = await resp.json()
     await this._synchronized(() => this._applyToken(token, refreshToken), 'apply')
     await this.getSessionClaims()
   }
