@@ -180,6 +180,19 @@ const { status } = await useAsyncData(
   }
 )
 
+function postLogin() {
+  // Invalidate any existing candidate for this user since they've done a fresh login
+  const currentSub = api.effectiveToken.value?.decoded.sub
+  if (currentSub && api.candidateTokens.value[currentSub]) {
+    delete api.candidateTokens.value[currentSub]
+    console.log(`[Login] Invalidated candidate token for ${currentSub} due to fresh login`)
+  }
+
+  const target = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
+  console.log(`Login finished, redirecting to ${target}`)
+  router.replace(target)
+}
+
 watch(
   [data, config, status],
   ([data, config, status]) => {
@@ -196,19 +209,6 @@ watch(
   },
   { immediate: true }
 )
-
-function postLogin() {
-  // Invalidate any existing candidate for this user since they've done a fresh login
-  const currentSub = api.effectiveToken.value?.decoded.sub
-  if (currentSub && api.candidateTokens.value[currentSub]) {
-    delete api.candidateTokens.value[currentSub]
-    console.log(`[Login] Invalidated candidate token for ${currentSub} due to fresh login`)
-  }
-
-  const target = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-  console.log(`Login finished, redirecting to ${target}`)
-  router.replace(target)
-}
 
 async function onQuickLogin(sub: string) {
   selectedSub.value = sub

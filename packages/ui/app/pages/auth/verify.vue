@@ -169,6 +169,22 @@ const { status } = await useAsyncData(
   }
 )
 
+let redirected = false
+
+function postVerify() {
+  if (redirected) return
+  redirected = true
+  router.replace(typeof route.query.redirect === 'string' ? route.query.redirect : '/')
+}
+
+function onBack() {
+  if (type.value) {
+    type.value = ''
+  } else {
+    router.back()
+  }
+}
+
 watch(
   [data, config, status],
   ([data, config, status]) => {
@@ -185,22 +201,6 @@ watch(
   },
   { immediate: true }
 )
-
-let redirected = false
-
-function postVerify() {
-  if (redirected) return
-  redirected = true
-  router.replace(typeof route.query.redirect === 'string' ? route.query.redirect : '/')
-}
-
-function onBack() {
-  if (type.value) {
-    type.value = ''
-  } else {
-    router.back()
-  }
-}
 
 watch(
   () => api.effectiveToken.value?.decoded.level,
