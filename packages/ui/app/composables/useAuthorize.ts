@@ -7,6 +7,10 @@ import type { SecurityLevel } from '~/utils/api'
 type IAppDTO = InferResponseType<ApiManager['public']['app'][':id']['$get']>['app']
 
 abstract class Connector {
+  redirect
+  constructor() {
+    this.redirect = useRedirect()
+  }
   abstract preAuthorize(params: IAuthorizeParams, app: IAppDTO): Promise<void>
   abstract onAuthorize(
     params: IAuthorizeParams,
@@ -89,7 +93,7 @@ class OpenIDConnector extends Connector {
       const url = new URL(redirect_uri)
       url.searchParams.set('code', data.code)
       url.searchParams.set('state', state)
-      redirectToApp(params.appId, url.toString())
+      this.redirect.toApp(params.appId, url.toString())
     }
   }
 
@@ -104,13 +108,13 @@ class OpenIDConnector extends Connector {
     const url = new URL(redirect_uri)
     url.searchParams.set('code', response.code)
     url.searchParams.set('state', response.state as string)
-    redirectToApp(params.appId, url.toString())
+    this.redirect.toApp(params.appId, url.toString())
   }
 
   override async onCancel(params: IAuthorizeParams, app: IAppDTO): Promise<void> {
     const url = new URL(params.params.redirect_uri)
     url.searchParams.set('error', 'access_denied')
-    redirectToApp(params.appId, url.toString())
+    this.redirect.toApp(params.appId, url.toString())
   }
 }
 

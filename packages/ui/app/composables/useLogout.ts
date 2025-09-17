@@ -11,6 +11,10 @@ export interface IPreLogoutResult {
 }
 
 abstract class LogoutConnector {
+  redirect
+  constructor() {
+    this.redirect = useRedirect()
+  }
   abstract preLogout(params: ILogoutParams): Promise<IPreLogoutResult>
   abstract onLogout(
     preLogoutResult: IPreLogoutResult,
@@ -102,7 +106,7 @@ class OpenIDLogoutConnector extends LogoutConnector {
     if (preLogoutResult.redirect) {
       beforeRedirect?.()
       // FIXME: handle logout state param
-      redirectToApp(preLogoutResult.app?._id ?? '', preLogoutResult.redirect)
+      this.redirect.toApp(preLogoutResult.app?._id ?? '', preLogoutResult.redirect)
     }
   }
 
@@ -113,7 +117,7 @@ class OpenIDLogoutConnector extends LogoutConnector {
   ) {
     if (preLogoutResult.redirect) {
       beforeRedirect?.()
-      redirectToApp(preLogoutResult.app?._id ?? '', preLogoutResult.redirect)
+      this.redirect.toApp(preLogoutResult.app?._id ?? '', preLogoutResult.redirect)
     }
   }
 }
