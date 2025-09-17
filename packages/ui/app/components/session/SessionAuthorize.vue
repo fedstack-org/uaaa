@@ -97,6 +97,9 @@ const { run: authorize, running } = useTask(async () => {
   }
   try {
     await props.params.connector.onAuthorize(props.params, app.value)
+    if (config.value.nonInteractive) {
+      return symNoToast
+    }
   } catch (err) {
     if (isAPIError(err)) {
       switch (err.code) {
