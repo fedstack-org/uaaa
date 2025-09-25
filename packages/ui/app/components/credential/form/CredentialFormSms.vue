@@ -19,8 +19,8 @@
             rounded="1"
             :prepend-icon="mdAndUp ? 'mdi-send' : ''"
             :loading="sendCodeRunning"
-            @click="sendCode"
             block
+            @click="sendCode"
           >
             {{ t('actions.send-otp') }}
           </VBtn>
@@ -86,14 +86,10 @@ const phoneRules = [
 const isLoading = ref(false)
 
 const { run: sendCode, running: sendCodeRunning } = useTask(async () => {
-  try {
-    const resp = await api.sms.send.$post({ json: { phone: phone.value } })
-    await api.checkResponse(resp)
-    toast.success(t('hint.sms-sent'))
-    return symNoToast
-  } catch (err) {
-    throw err
-  }
+  const resp = await api.sms.send.$post({ json: { phone: phone.value } })
+  await api.checkResponse(resp)
+  toast.success(t('hint.sms-sent'))
+  return symNoToast
 })
 
 async function submit(ev?: SubmitEventPromise) {

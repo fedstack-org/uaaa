@@ -11,7 +11,7 @@
               :subtitle="app.app.description"
             >
               <template #prepend>
-                <AppAvatar :appId="app.appId" :icon="app.app.icon" :name="app.app.name" />
+                <AppAvatar :app-id="app.appId" :icon="app.app.icon" :name="app.app.name" />
               </template>
               <template #append>
                 <VBtn

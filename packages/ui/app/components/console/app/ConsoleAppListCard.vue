@@ -9,12 +9,12 @@
       </div>
     </VCardTitle>
     <VDataTable v-if="apps" :items="apps" :headers="headers">
-      <template v-slot:item.actions="{ item }">
+      <template #[`item.actions`]="{ item }">
         <VBtn icon="mdi-pencil" variant="text" @click="onEdit(item)" />
-        <VBtn icon="mdi-delete" variant="text" @click="onDelete(item)" :loading="deleteRunning" />
+        <VBtn icon="mdi-delete" variant="text" :loading="deleteRunning" @click="onDelete(item)" />
       </template>
     </VDataTable>
-    <ConsoleAppEditDialog v-model="editDialogOpen" @updated="refresh()" :manifest="value" />
+    <ConsoleAppEditDialog v-model="editDialogOpen" :manifest="value" @updated="refresh()" />
   </VCard>
 </template>
 

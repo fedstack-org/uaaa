@@ -28,8 +28,8 @@
       <div class="px-4">
         <div v-for="(claim, i) of app.requestedClaims" :key="'c' + i">
           <VCheckbox
-            density="compact"
             v-model="claims[claim.name]"
+            density="compact"
             :append-icon="claim.verified ? 'mdi-shield-check' : undefined"
             :readonly="(claim.required && claims[claim.name]) || readonly"
             hide-details
@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import type { IAppDoc } from '@uaaa/server'
 
-const props = defineProps<{
+const { app, readonly, fillRequired } = defineProps<{
   app: Pick<IAppDoc, '_id' | 'requestedClaims' | 'requestedPermissions' | 'icon' | 'name'>
   readonly?: boolean
   fillRequired?: boolean
@@ -66,10 +66,10 @@ const claims = defineModel<Record<string, boolean>>('claims', { default: {} })
 const { toVerify } = useRedirect()
 
 const { data: installation, pending } = useAsyncData(
-  () => `app-grants-${props.app._id}`,
+  () => `app-grants-${app._id}`,
   async () => {
     try {
-      const resp = await api.user.installation[':id'].$get({ param: { id: props.app._id } })
+      const resp = await api.user.installation[':id'].$get({ param: { id: app._id } })
       await api.checkResponse(resp)
       const { installation } = await resp.json()
       return installation
@@ -93,13 +93,13 @@ watch(
       permissions.value = Object.fromEntries(installation.grantedPermissions.map((p) => [p, true]))
       claims.value = Object.fromEntries(installation.grantedClaims.map((c) => [c, true]))
     }
-    if (props.fillRequired) {
-      for (const permission of props.app.requestedPermissions) {
+    if (fillRequired) {
+      for (const permission of app.requestedPermissions) {
         if (permission.required) {
           permissions.value[permission.perm] = true
         }
       }
-      for (const claim of props.app.requestedClaims) {
+      for (const claim of app.requestedClaims) {
         if (claim.required) {
           claims.value[claim.name] = true
         }

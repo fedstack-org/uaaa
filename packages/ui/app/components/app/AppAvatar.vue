@@ -1,6 +1,6 @@
 <template>
   <VTooltip :text="data?.name">
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <VAvatar
         rounded
         v-bind="{ ...$attrs, ...props }"
@@ -39,7 +39,8 @@ const { data } = await useAsyncData(props.appId, async () => {
 
 const generateTitle = (name: string) => {
   const [first, second] = name.split(/\s+/) as [string, string?]
-  const code = (first[0]! + (second ? second[0]! : (first[1]! ?? ''))).toUpperCase()
+  const code = (first[0]! + (second ? second[0]! : (first[1] ?? ''))).toUpperCase()
+  // eslint-disable-next-line no-control-regex
   if (/[^\x01-\x7E]/.test(code)) return code[0]
   return code
 }

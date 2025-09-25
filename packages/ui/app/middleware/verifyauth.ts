@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to, _from) => {
   if (!api.isLoggedIn.value) {
     return navigateTo({ path: '/auth/signin', query: { redirect: to.fullPath } })
   }

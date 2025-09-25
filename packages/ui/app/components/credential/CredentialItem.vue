@@ -26,8 +26,8 @@
         <VBtn variant="tonal" prepend-icon="mdi-shield-remove" color="error">
           {{ t('actions.unbind') }}
           <CredentialBindDialog
-            action="unbind"
             :id="credential._id"
+            action="unbind"
             :type="credential.type"
             @updated="() => emit('updated')"
           />
@@ -35,8 +35,8 @@
         <VBtn variant="tonal" prepend-icon="mdi-shield-edit">
           {{ t('actions.rebind') }}
           <CredentialBindDialog
-            action="bind"
             :id="credential._id"
+            action="bind"
             :type="credential.type"
             @updated="() => emit('updated')"
           />
@@ -56,7 +56,6 @@
 
 <script setup lang="ts">
 import type { ICredentialDoc } from '@uaaa/server'
-import { formatTimestamp } from '~/utils/date'
 
 defineProps<{
   credential: ICredentialDoc

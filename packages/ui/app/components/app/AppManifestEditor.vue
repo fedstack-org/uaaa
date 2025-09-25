@@ -53,7 +53,7 @@ const manifest = defineModel<IAppManifest>({ required: true })
 const file = ref<File | null>(null)
 const tab = ref(0)
 
-const { run, running } = useTask(async (file: File) => {
+const { run } = useTask(async (file: File) => {
   const ext = file.name.split('.').pop()
   const content = await file.text()
   let value: IAppManifest

@@ -5,14 +5,13 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
   modules: [
-    //
     '@vueuse/nuxt',
     '@unocss/nuxt',
     '@nuxtjs/i18n',
+    '@nuxt/eslint',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
-        config.plugins.push(vuetify({ autoImport: true }))
+        config.plugins!.push(vuetify({ autoImport: true }))
       })
     }
   ],

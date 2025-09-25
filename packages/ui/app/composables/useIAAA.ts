@@ -52,7 +52,7 @@ export const useIAAA = () => {
 
     const { client, close } = getWindow(redirectUrl)
     if (!client) throw new Error('Failed to open IAAA window')
-    let sameOrigin =
+    const sameOrigin =
       typeof crossOrigin === 'boolean'
         ? !crossOrigin
         : new URL(redirectUrl).origin === window.location.origin
@@ -69,7 +69,7 @@ export const useIAAA = () => {
             return token
           }
         } catch (err) {
-          //
+          console.warn(err)
         }
         await sleep(200)
       }

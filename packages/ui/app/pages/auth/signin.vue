@@ -73,7 +73,7 @@
       </template>
       <VFadeTransition mode="out-in">
         <template v-if="isRemote">
-          <VSkeletonLoader type="image" v-if="!userCode" />
+          <VSkeletonLoader v-if="!userCode" type="image" />
           <div v-else class="flex">
             <div class="text-center p-4">
               <div>{{ t('msg.scan-qrcode-to-authorize') }}</div>
@@ -101,7 +101,7 @@
         </template>
         <CredentialForm v-else-if="type" action="login" :type="type" @updated="postLogin" />
         <template v-else-if="data">
-          <VCardText class="flex flex-col gap-2" v-if="data.allowedTypes.length">
+          <VCardText v-if="data.allowedTypes.length" class="flex flex-col gap-2">
             <VBtn
               v-for="loginType of data.allowedTypes"
               :key="loginType"
@@ -184,6 +184,7 @@ function postLogin() {
   // Invalidate any existing candidate for this user since they've done a fresh login
   const currentSub = api.effectiveToken.value?.decoded.sub
   if (currentSub && api.candidateTokens.value[currentSub]) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete api.candidateTokens.value[currentSub]
     console.log(`[Login] Invalidated candidate token for ${currentSub} due to fresh login`)
   }
@@ -198,7 +199,7 @@ watch(
   ([data, config, status]) => {
     switch (status) {
       case 'error':
-        if (data?.allowedTypes.includes(config?.preferType as any)) {
+        if (data?.allowedTypes.includes(config?.preferType as string)) {
           type.value = config?.preferType as string
         }
         break

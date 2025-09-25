@@ -2,9 +2,11 @@ import { type } from 'arktype'
 
 const tTransparentUXConfig = type({
   preferType: 'string?',
-  nonInteractive: 'string.json.parse?',
+  nonInteractive: type('string.json.parse')
+    .pipe((v) => !!v)
+    .optional(),
   preAuthType: 'string?',
-  preAuthPayload: 'string.json.parse?'
+  preAuthPayload: type('string.json.parse').to('unknown').optional()
 }).onDeepUndeclaredKey('delete')
 
 export const useTransparentUX = () => {
@@ -23,6 +25,7 @@ export const useTransparentUX = () => {
         if (route.query.redirect && typeof route.query.redirect === 'string') {
           params = router.resolve(route.query.redirect).query.params
         }
+      // eslint-disable-next-line no-fallthrough
       case '/logout':
       case '/authorize':
         return parseTransparentUXConfig(params)

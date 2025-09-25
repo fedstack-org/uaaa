@@ -6,7 +6,7 @@
           <VList>
             <VListItem :title="app.name" :subtitle="app.description">
               <template #prepend>
-                <AppAvatar :appId="app._id" :icon="app.icon" :name="app.name" />
+                <AppAvatar :app-id="app._id" :icon="app.icon" :name="app.name" />
               </template>
             </VListItem>
           </VList>

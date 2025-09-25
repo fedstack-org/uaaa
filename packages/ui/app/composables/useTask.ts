@@ -1,12 +1,14 @@
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IUseTaskOptions {
   //
 }
 
 export const symNoToast = Symbol('noToast')
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useTask = <T extends any[], R>(
   task: (...args: T) => Promise<R | typeof symNoToast>,
-  options?: IUseTaskOptions
+  _options?: IUseTaskOptions
 ) => {
   const running = ref(false)
   const error = ref<unknown>(null)

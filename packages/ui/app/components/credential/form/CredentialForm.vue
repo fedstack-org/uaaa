@@ -1,6 +1,6 @@
 <template>
-  <component v-if="components[type]" :is="components[type]" v-bind="$attrs" />
-  <VAlert type="error" v-else>{{ t('msg.unknown-credential-type') }}</VAlert>
+  <component :is="components[type]" v-if="components[type]" v-bind="$attrs" />
+  <VAlert v-else type="error">{{ t('msg.unknown-credential-type') }}</VAlert>
 </template>
 
 <script setup lang="ts">

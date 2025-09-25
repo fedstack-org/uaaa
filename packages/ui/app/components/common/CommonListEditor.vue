@@ -13,7 +13,7 @@
       <div class="flex-1">
         <slot
           name="item"
-          :modelValue="value"
+          :model-value="value"
           @update:modelValue="($event: T) => (model[index] = $event)"
         />
       </div>

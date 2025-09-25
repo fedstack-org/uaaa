@@ -1,6 +1,6 @@
 <template>
   <VMenu>
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <VBtn v-bind="props" icon="mdi-translate" variant="text" color="text" />
     </template>
     <VList density="comfortable">
@@ -8,8 +8,8 @@
         v-for="locale of locales"
         :key="locale.code"
         :title="locale.name"
-        @click="persisted = locale.code"
         :append-icon="persisted === locale.code ? 'mdi-check' : undefined"
+        @click="persisted = locale.code"
       />
     </VList>
   </VMenu>

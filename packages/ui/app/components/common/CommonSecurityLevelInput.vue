@@ -3,7 +3,7 @@
     <div>
       {{ t('msg.security-level') }}
       <VBtnToggle v-model="model" variant="outlined">
-        <VBtn v-for="i in 5" :value="i - 1" :text="t(`securityLevel.${i - 1}`)" />
+        <VBtn v-for="i in 5" :key="i" :value="i - 1" :text="t(`securityLevel.${i - 1}`)" />
       </VBtnToggle>
     </div>
   </VInput>

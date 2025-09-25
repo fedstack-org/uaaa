@@ -87,6 +87,7 @@ class OpenIDConnector extends Connector {
         }
       })
       await api.checkResponse(resp)
+      navigateTo('/')
     } else {
       beforeRedirect?.()
       await sleep(200)
@@ -111,7 +112,7 @@ class OpenIDConnector extends Connector {
     this.redirect.toApp(params.appId, url.toString())
   }
 
-  override async onCancel(params: IAuthorizeParams, app: IAppDTO): Promise<void> {
+  override async onCancel(params: IAuthorizeParams, _app: IAppDTO): Promise<void> {
     const url = new URL(params.params.redirect_uri)
     url.searchParams.set('error', 'access_denied')
     this.redirect.toApp(params.appId, url.toString())
@@ -132,6 +133,7 @@ export interface IAuthorizeParams {
   securityLevel: SecurityLevel
   permissions?: string[]
   optionalPermissions?: string[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params?: any
   userCode?: string
   confidential?: boolean
@@ -165,6 +167,7 @@ export const parseAuthorizeParams = (query: LocationQuery) => {
       params.optionalPermissions = JSON.parse(toSingle(query.optionalPermissions, '[]'))
     }
   } catch (err) {
+    console.warn('Failed to parse authorize params', err)
     return { error: `Invalid params` }
   }
   return params
@@ -214,6 +217,7 @@ export const useRemoteAuthorize = () => {
     qrcode.value = `data:image/svg+xml,${encodeURIComponent(svg)}`
     for (;;) {
       const resp = await api.public.remote_authorize_poll.$post({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         json: { userCode, authCode, request: target.query as any }
       })
       await api.checkResponse(resp)

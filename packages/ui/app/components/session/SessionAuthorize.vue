@@ -38,7 +38,7 @@
         </div>
         <div>
           <VDialog v-if="showGrant" activator="parent" max-width="800">
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <VBtn
                 variant="text"
                 size="small"
@@ -47,7 +47,7 @@
                 v-bind="props"
               />
             </template>
-            <template v-slot:default="{ isActive }">
+            <template #default="{ isActive }">
               <VCard :title="t('msg.grants')">
                 <AppGrantEditor :app="app" readonly />
                 <VCardActions class="justify-end">

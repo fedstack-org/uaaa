@@ -4,17 +4,17 @@
       <div>{{ t('msg.token-list') }}</div>
     </VCardTitle>
     <VDataTableServer
+      v-model:page="page"
+      v-model:items-per-page="perPage"
       :headers="headers"
       :items-length="cachedCount"
       :items="data ?? []"
       :items-per-page-options="[15, 30, 50, 100]"
       :loading="status === 'pending'"
-      v-model:page="page"
-      v-model:items-per-page="perPage"
       item-value="_id"
       density="compact"
     >
-      <template v-slot:[`item._id`]="{ item }">
+      <template #[`item._id`]="{ item }">
         <code>{{ item._id }}</code>
         <VChip
           v-if="effectiveTokens.includes(item._id)"
@@ -23,21 +23,21 @@
           class="ml-2"
         />
       </template>
-      <template v-slot:[`item.securityLevel`]="{ item }">
+      <template #[`item.securityLevel`]="{ item }">
         {{ t(`securityLevel.${item.securityLevel}`) }}
       </template>
-      <template v-slot:[`item.targetAppId`]="{ item }">
+      <template #[`item.targetAppId`]="{ item }">
         <div class="flex gap-1">
-          <AppAvatar v-for="app of item.apps" size="36px" :key="app" :appId="app" />
+          <AppAvatar v-for="app of item.apps" :key="app" size="36px" :app-id="app" />
         </div>
       </template>
-      <template v-slot:[`item.appId`]="{ item }">
-        <AppAvatar size="36px" :appId="item.appId" />
+      <template #[`item.appId`]="{ item }">
+        <AppAvatar size="36px" :app-id="item.appId" />
       </template>
-      <template v-slot:[`item.createdAt`]="{ item }">
+      <template #[`item.createdAt`]="{ item }">
         <VChip class="font-mono" :text="new Date(item.createdAt).toLocaleString()" />
       </template>
-      <template v-slot:[`item.expiresAt`]="{ item }">
+      <template #[`item.expiresAt`]="{ item }">
         <div class="flex gap-1 py-1">
           <VChip class="font-mono mr-2" :text="new Date(item.expiresAt).toLocaleString()" />
           <VChip v-if="item.terminated" color="info" :text="t('msg.terminated')" />
@@ -54,7 +54,7 @@
           <VChip v-else color="warning" :text="t('msg.active')" />
         </div>
       </template>
-      <template v-slot:[`item._actions`]="{ item }">
+      <template #[`item._actions`]="{ item }">
         <div class="flex gap-2">
           <VBtn
             :text="t('actions.terminate')"
@@ -88,7 +88,6 @@ const headers = [
 const effectiveTokens = computed(() =>
   Object.values(api.tokens.value).map((token) => token.decoded.jti)
 )
-const effectiveToken = computed(() => api.effectiveToken.value?.decoded.jti)
 
 const { page, perPage, data, cachedCount, status, execute } = usePagination(
   async (skip, limit, doCount) => {

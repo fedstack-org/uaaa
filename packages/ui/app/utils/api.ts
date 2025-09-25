@@ -107,7 +107,9 @@ export class ApiManager {
     this.sms = hc<ISmsApi>('/api/plugin/sms', { headers })
     this.webauthn = hc<IWebauthnApi>('/api/plugin/webauthn', { headers })
 
-    this.isLoggedIn.value && setTimeout(() => this.getSessionClaims().catch(console.error), 0)
+    if (this.isLoggedIn.value) {
+      setTimeout(() => this.getSessionClaims().catch(console.error), 0)
+    }
 
     this.refreshCandidateTokens()
   }
@@ -168,6 +170,7 @@ export class ApiManager {
     // Token not refreshed, check if it is expired
     if (remaining < 3 * 1000) {
       console.log(`[API] Token at level ${level} dropped remaining=${remaining}ms`)
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete this.tokens.value[level]
     }
   }
@@ -234,6 +237,7 @@ export class ApiManager {
         // Token not refreshed, check if it is expired
         if (remaining < 3 * 1000) {
           console.log(`[API] Candidate token for ${sub} dropped remaining=${remaining}ms`)
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete this.candidateTokens.value[sub]
         }
       }
@@ -343,6 +347,7 @@ export class ApiManager {
       this.tokens.value[0] = clientToken
       this.securityLevel.value = 0
       this.claims.value = restoreUserClaims(claims)
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete this.candidateTokens.value[sub]
       console.log(`[API] Switched to account ${claims.username}`)
       return true

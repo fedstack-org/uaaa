@@ -9,7 +9,7 @@
     </VBtn>
 
     <VMenu>
-      <template v-slot:activator="{ props }">
+      <template #activator="{ props }">
         <VBtn
           v-bind="props"
           prepend-icon="mdi-account"

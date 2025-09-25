@@ -1,5 +1,11 @@
-import { URL } from 'whatwg-url'
 import { minimatch } from 'minimatch'
+import { URL } from 'whatwg-url'
+
+// TODO: use @uaaa/core's Permission class
+
+export interface AppPermissionPaths {
+  [path: string]: string
+}
 
 export class Permission<AppId extends string = string> {
   static fromFullURL<AppId extends string = string>(url: string) {
@@ -40,7 +46,7 @@ export class Permission<AppId extends string = string> {
     return `uperm://${this.appId}${this.toScopedString()}`
   }
 
-  test(path: string) {
+  test(path: AppPermissionPaths[AppId]) {
     return minimatch(path, this.path)
   }
 }

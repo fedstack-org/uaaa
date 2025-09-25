@@ -15,7 +15,7 @@
         <slot
           name="item"
           class="flex-1"
-          :modelValue="model[key]"
+          :model-value="model[key]"
           @update:modelValue="($event: T) => (model[key] = $event)"
         />
       </div>
@@ -38,6 +38,5 @@ defineProps<{
   factory: () => T
 }>()
 
-const { t } = useI18n()
 const newKey = ref('')
 </script>

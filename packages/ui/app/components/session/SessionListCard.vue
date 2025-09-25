@@ -4,52 +4,52 @@
       <div>{{ t('msg.session-list') }}</div>
     </VCardTitle>
     <VDataTableServer
+      v-model:page="page"
+      v-model:items-per-page="perPage"
       :headers="headers"
       :items-length="cachedCount"
       :items="data ?? []"
       :items-per-page-options="[15, 30, 50, 100]"
       :loading="status === 'pending'"
-      v-model:page="page"
-      v-model:items-per-page="perPage"
       item-value="_id"
       density="compact"
     >
-      <template v-slot:[`item._id`]="{ item }">
+      <template #[`item._id`]="{ item }">
         <code>{{ item._id }}</code>
         <VChip
-          size="small"
           v-if="item._id === currentSession"
+          size="small"
           color="info"
           :text="t('msg.current-session')"
           class="ml-2"
         />
       </template>
-      <template v-slot:[`item.createdAt`]="{ item }">
+      <template #[`item.createdAt`]="{ item }">
         <VChip size="small" class="font-mono" :text="new Date(item.createdAt).toLocaleString()" />
       </template>
-      <template v-slot:[`item.expiresAt`]="{ item }">
+      <template #[`item.expiresAt`]="{ item }">
         <div class="flex gap-1">
           <VChip
             size="small"
             class="font-mono mr-2"
             :text="new Date(item.expiresAt).toLocaleString()"
           />
-          <VChip size="small" v-if="item.terminated" color="info" :text="t('msg.terminated')" />
+          <VChip v-if="item.terminated" size="small" color="info" :text="t('msg.terminated')" />
           <VChip
-            size="small"
             v-else-if="item.expiresAt < Date.now()"
+            size="small"
             color="success"
             :text="t('msg.expired')"
           />
-          <VChip size="small" v-else color="warning" :text="t('msg.active')" />
+          <VChip v-else size="small" color="warning" :text="t('msg.active')" />
         </div>
       </template>
-      <template v-slot:[`item._apps`]="{ item }">
+      <template #[`item._apps`]="{ item }">
         <div class="flex gap-1">
-          <AppAvatar size="36px" v-for="app of item.authorizedApps" :key="app" :appId="app" />
+          <AppAvatar v-for="app of item.authorizedApps" :key="app" size="36px" :app-id="app" />
         </div>
       </template>
-      <template v-slot:[`item._actions`]="{ item }">
+      <template #[`item._actions`]="{ item }">
         <div class="flex gap-2 py-1">
           <VBtn :text="t('msg.view')" variant="tonal" :to="`/session/${item._id}`" />
           <VBtn

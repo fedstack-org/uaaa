@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to, _from) => {
   const layout = to.meta.layout || 'default'
   if (['plain', 'zen'].includes(layout)) {
     return

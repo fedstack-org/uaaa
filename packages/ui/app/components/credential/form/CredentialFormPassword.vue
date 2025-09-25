@@ -19,7 +19,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const toast = useToast()
 
 const showUserId = computed(() => props.action === 'login')
 const userId = ref('')
@@ -39,7 +38,7 @@ const { running, run } = useTask(async () => {
         password: password.value
       })
       break
-    case 'bind':
+    case 'bind': {
       const resp = await api.user.credential.bind.$put({
         json: {
           type: 'password',
@@ -50,6 +49,7 @@ const { running, run } = useTask(async () => {
       const data = await resp.json()
       credentialId = data.credentialId
       break
+    }
     case 'unbind':
       if (!props.credentialId) throw new Error('No credentialId')
       await api.user.credential.$delete({

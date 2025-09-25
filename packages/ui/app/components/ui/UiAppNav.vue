@@ -3,7 +3,7 @@
     <VList nav>
       <VListItem v-for="(link, i) of links" :key="i" v-bind="link" :title="t(link.title)" />
       <VListGroup v-if="isAdmin" value="Admin">
-        <template v-slot:activator="{ props }">
+        <template #activator="{ props }">
           <VListItem v-bind="{ ...props, ...adminLinks[0] }" :title="t(adminLinks[0]!.title)" />
         </template>
         <VListItem
@@ -23,8 +23,8 @@
             <div class="text-xs font-mono tracking-tighter mt-[-6px]">v{{ version }}</div>
           </div>
         </VBtn>
-        <div class="px-2"></div>
-        <div class="flex-1"></div>
+        <div class="px-2"/>
+        <div class="flex-1"/>
         <UiLocaleSelector />
       </div>
     </template>

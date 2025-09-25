@@ -15,9 +15,9 @@
       <VDivider />
       <div class="flex justify-center items-center uppercase!">
         <VTextField
+          v-model="userCode"
           :rules="userCodeRules"
           :disabled="remoteAuthorizeRunning"
-          v-model="userCode"
           :label="t('msg.user-code')"
           :rounded="0"
         />

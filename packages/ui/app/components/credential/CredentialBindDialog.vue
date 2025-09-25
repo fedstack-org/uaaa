@@ -1,11 +1,11 @@
 <template>
   <VDialog activator="parent" class="max-w-lg">
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <VCard prepend-icon="mdi-note-edit" :title="t(`actions.${action}`)">
         <CredentialForm
           :type="type"
           :action="action"
-          :credentialId="id"
+          :credential-id="id"
           @updated="onUpdated(isActive)"
         />
       </VCard>

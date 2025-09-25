@@ -13,12 +13,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
-  "dependencies": {
-    "nuxt": "^4.1.0",
-    "vue": "^3.5.21"
-  },
   "devDependencies": {
     "@mdi/font": "^7.4.47",
+    "@nuxt/eslint": "^1.9.0",
     "@nuxtjs/i18n": "^10.0.6",
     "@simplewebauthn/browser": "^13.1.2",
     "@types/whatwg-url": "^13.0.0",
@@ -31,12 +28,15 @@
     "arktype": "^2.1.22",
     "confbox": "^0.2.2",
     "copy-to-clipboard": "^3.3.3",
+    "eslint": "^9.36.0",
     "hono": "^4.9.6",
     "minimatch": "^10.0.3",
+    "nuxt": "^4.1.2",
     "typescript": "^5.9.2",
     "unocss": "^66.5.0",
     "uqr": "^0.1.2",
     "vite-plugin-vuetify": "^2.1.2",
+    "vue": "^3.5.22",
     "vue-toastification": "^2.0.0-rc.5",
     "vue-tsc": "^3.0.6",
     "vuetify": "^3.9.7",

@@ -6,9 +6,9 @@
           <CommonLogo variant="flat" />
         </VIcon>
         <div class="flex self-stretch">
-          <div class="flex-1 flex justify-start"></div>
+          <div class="flex-1 flex justify-start"/>
           <div>{{ t('pages.auth.signout') }}</div>
-          <div class="flex-1 flex justify-start"></div>
+          <div class="flex-1 flex justify-start"/>
         </div>
       </VCardTitle>
       <VDivider />

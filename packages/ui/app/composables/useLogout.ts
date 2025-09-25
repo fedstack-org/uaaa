@@ -132,7 +132,7 @@ const isConnectorType = (value: string): value is ConnectorType => value in conn
 export interface ILogoutParams {
   type: ConnectorType
   connector: LogoutConnector
-  params?: any
+  params?: unknown
 }
 
 export const parseLogoutParams = (query: LocationQuery) => {
@@ -146,6 +146,7 @@ export const parseLogoutParams = (query: LocationQuery) => {
   try {
     params.params = JSON.parse(toSingle(query.params, '{}'))
   } catch (err) {
+    console.warn('Failed to parse logout params', err)
     return { error: `Invalid params` }
   }
   return params

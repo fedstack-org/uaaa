@@ -22,7 +22,7 @@
               </div>
               <div class="flex gap-2">
                 <VMenu v-if="types?.length">
-                  <template v-slot:activator="{ props }">
+                  <template #activator="{ props }">
                     <VBtn :text="t('actions.add-credential')" variant="tonal" v-bind="props" />
                   </template>
                   <VList density="compact">

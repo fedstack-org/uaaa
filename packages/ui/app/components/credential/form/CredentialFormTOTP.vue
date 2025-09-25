@@ -15,7 +15,7 @@
       <VBtn variant="tonal" :text="t('actions.submit')" :loading="isLoading" @click="submit()" />
     </VCardText>
   </template>
-  <template>
+  <template v-else>
     <VCardText class="flex flex-col gap-2">
       <VBtn variant="tonal" :text="t('actions.confirm')" :loading="isLoading" @click="submit()" />
     </VCardText>
@@ -48,7 +48,7 @@ const { running: isLoading, run: submit } = useTask(async () => {
     case 'verify':
       await api.verify('totp', props.targetLevel ?? 0, { code: code.value })
       break
-    case 'bind':
+    case 'bind': {
       if (!secret.value) return
       const resp = await api.user.credential.bind.$put({
         json: {
@@ -62,6 +62,7 @@ const { running: isLoading, run: submit } = useTask(async () => {
       credentialId = data.credentialId
       clearCachedTOTPSecret()
       break
+    }
     case 'unbind':
       if (!props.credentialId) throw new Error('No credentialId')
       await api.user.credential.$delete({

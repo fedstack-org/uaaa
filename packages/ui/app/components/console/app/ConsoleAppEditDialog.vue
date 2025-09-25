@@ -1,19 +1,17 @@
 <template>
-  <VDialog max-width="1280" v-model="model">
-    <template v-slot:default="{ isActive }">
-      <VCard prepend-icon="mdi-note-edit" :title="t(`actions.edit`, [t(`msg.app`)])">
-        <AppManifestEditor v-model="value" />
-        <VCardActions>
-          <VBtn :text="t('actions.cancel')" color="secondary" @click="model = false" />
-          <VBtn
-            :text="t('actions.reset')"
-            color="error"
-            @click="value = JSON.parse(JSON.stringify(props.manifest))"
-          />
-          <VBtn :text="t('actions.submit')" color="primary" @click="run()" />
-        </VCardActions>
-      </VCard>
-    </template>
+  <VDialog v-model="model" max-width="1280">
+    <VCard prepend-icon="mdi-note-edit" :title="t(`actions.edit`, [t(`msg.app`)])">
+      <AppManifestEditor v-model="value" />
+      <VCardActions>
+        <VBtn :text="t('actions.cancel')" color="secondary" @click="model = false" />
+        <VBtn
+          :text="t('actions.reset')"
+          color="error"
+          @click="value = JSON.parse(JSON.stringify(props.manifest))"
+        />
+        <VBtn :text="t('actions.submit')" color="primary" @click="run()" />
+      </VCardActions>
+    </VCard>
   </VDialog>
 </template>
 

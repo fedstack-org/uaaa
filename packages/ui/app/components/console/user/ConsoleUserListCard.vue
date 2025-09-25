@@ -4,16 +4,16 @@
       <div>{{ t('msg.user-list') }}</div>
     </VCardTitle>
     <VDataTableServer
+      v-model:page="page"
+      v-model:items-per-page="perPage"
       :headers="headers"
       :items-length="cachedCount"
       :items="data ?? []"
       :items-per-page-options="[15, 30, 50, 100]"
       :loading="status === 'pending'"
-      v-model:page="page"
-      v-model:items-per-page="perPage"
       item-value="_id"
     >
-      <template v-slot:[`item._id`]="{ item }">
+      <template #[`item._id`]="{ item }">
         <code>{{ item._id }}</code>
         <VChip
           v-if="item._id === currentUser"
@@ -22,11 +22,11 @@
           class="ml-2"
         />
       </template>
-      <template v-slot:[`item._username`]="{ item }">
+      <template #[`item._username`]="{ item }">
         {{ item.claims?.username.value }}
       </template>
-      <template v-slot:[`item._actions`]="{ item }">
-        <div class="flex gap-2"></div>
+      <template #[`item._actions`]>
+        <div class="flex gap-2" />
       </template>
     </VDataTableServer>
   </VCard>
@@ -42,15 +42,13 @@ const headers = [
 ] as const
 const currentUser = computed(() => api.effectiveToken.value?.decoded.sub)
 
-const { page, perPage, data, cachedCount, status, execute } = usePagination(
-  async (skip, limit, doCount) => {
-    const resp = await api.console.user.$get({
-      query: { skip: '' + skip, limit: '' + limit, count: doCount ? '1' : '0' }
-    })
-    await api.checkResponse(resp)
-    const { users, count } = await resp.json()
-    console.log(users)
-    return { items: users, count }
-  }
-)
+const { page, perPage, data, cachedCount, status } = usePagination(async (skip, limit, doCount) => {
+  const resp = await api.console.user.$get({
+    query: { skip: '' + skip, limit: '' + limit, count: doCount ? '1' : '0' }
+  })
+  await api.checkResponse(resp)
+  const { users, count } = await resp.json()
+  console.log(users)
+  return { items: users, count }
+})
 </script>

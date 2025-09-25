@@ -12,7 +12,7 @@
       </VBtn>
     </VToolbarItems>
 
-    <VSpacer></VSpacer>
+    <VSpacer/>
 
     <UiUserMenu :dense="!mdAndUp" />
     <UiLocaleSelector v-if="!showNavIcon" />

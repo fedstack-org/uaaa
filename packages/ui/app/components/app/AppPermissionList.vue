@@ -10,10 +10,10 @@
       <template #append>
         <div class="text-right">
           <div>
-            <code v-text="url.host" class="text-sm text-gray" />
+            <code class="text-sm text-gray" v-text="url.host" />
           </div>
           <div>
-            <code v-text="path" class="text-sm text-gray" />
+            <code class="text-sm text-gray" v-text="path" />
           </div>
         </div>
       </template>

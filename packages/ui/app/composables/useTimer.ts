@@ -24,7 +24,7 @@ export const useTimer = (options?: IUseTimerOptions) => {
     timeout = setTimeout(tick, 1000)
   }
   function reset() {
-    timeout && clearTimeout(timeout)
+    if (timeout) clearTimeout(timeout)
     rest.value = 0
     running.value = false
   }

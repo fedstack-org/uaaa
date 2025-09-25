@@ -21,7 +21,7 @@
             <div>{{ t('pages.auth.verify') }}</div>
             <div v-if="data?.app" class="text-caption">{{ data.app.name }}</div>
           </div>
-          <div class="flex-1 flex justify-start"></div>
+          <div class="flex-1 flex justify-start" />
         </div>
       </VCardTitle>
       <VDivider />
@@ -72,7 +72,7 @@
           @updated="postVerify"
         />
         <template v-else-if="data">
-          <VCardText class="flex flex-col gap-2" v-if="data.allowedTypes.length">
+          <VCardText v-if="data.allowedTypes.length" class="flex flex-col gap-2">
             <VBtn
               v-for="item of data.allowedTypes"
               :key="item"
@@ -190,7 +190,7 @@ watch(
   ([data, config, status]) => {
     switch (status) {
       case 'error':
-        if (data?.allowedTypes.includes(config?.preferType as any)) {
+        if (data?.allowedTypes.includes(config?.preferType as string)) {
           type.value = config?.preferType as string
         }
         break
