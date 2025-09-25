@@ -507,6 +507,7 @@ export class OAuthManager {
   }
 
   _checkSecurityLevel(level: unknown) {
+    if (typeof level === 'number' && isSecurityLevel(level)) return `${level}`
     if (typeof level === 'string' && isSecurityLevel(parseInt(level))) return level
     return null
   }
