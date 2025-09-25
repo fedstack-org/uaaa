@@ -132,7 +132,8 @@ const isConnectorType = (value: string): value is ConnectorType => value in conn
 export interface ILogoutParams {
   type: ConnectorType
   connector: LogoutConnector
-  params?: unknown
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params?: any
 }
 
 export const parseLogoutParams = (query: LocationQuery) => {

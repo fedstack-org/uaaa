@@ -1,10 +1,7 @@
 <template>
   <VCard flat>
     <VCardText>
-      <VTextField
-        v-model.number="manifest.baseSecurityLevel"
-        label="Base security level"
-      />
+      <VTextField v-model.number="manifest.baseSecurityLevel" label="Base security level" />
       <template v-if="manifest.openid">
         <VCheckbox v-model="manifest.openid.allowPublicClient" label="Allow public client" />
         <VCheckbox v-model="manifest.openid.defaultPublicClient" label="Default public client" />

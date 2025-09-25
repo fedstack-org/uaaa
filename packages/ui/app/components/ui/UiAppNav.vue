@@ -23,8 +23,8 @@
             <div class="text-xs font-mono tracking-tighter mt-[-6px]">v{{ version }}</div>
           </div>
         </VBtn>
-        <div class="px-2"/>
-        <div class="flex-1"/>
+        <div class="px-2" />
+        <div class="flex-1" />
         <UiLocaleSelector />
       </div>
     </template>

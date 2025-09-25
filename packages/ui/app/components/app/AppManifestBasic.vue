@@ -11,18 +11,18 @@
         <div v-if="autoInstallEnabled" class="ml-6">
           <VCheckbox v-model="advancedAutoInstall" label="Advanced Auto Install Configuration" />
           <div v-if="advancedAutoInstall" class="ml-6">
-            <CommonListEditor 
-              v-model="autoInstallConfig.grantedPermissions" 
-              label="Pre-granted Permissions" 
+            <CommonListEditor
+              v-model="autoInstallConfig.grantedPermissions"
+              label="Pre-granted Permissions"
               :factory="() => ''"
             >
               <template #item="scoped">
                 <VTextField v-bind="scoped" label="Permission" />
               </template>
             </CommonListEditor>
-            <CommonListEditor 
-              v-model="autoInstallConfig.grantedClaims" 
-              label="Pre-granted Claims" 
+            <CommonListEditor
+              v-model="autoInstallConfig.grantedClaims"
+              label="Pre-granted Claims"
               :factory="() => ''"
             >
               <template #item="scoped">

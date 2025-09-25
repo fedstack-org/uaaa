@@ -12,7 +12,7 @@
           <div class="text-center">
             <div>{{ t('pages.auth.switch') }}</div>
           </div>
-          <div class="flex-1"/>
+          <div class="flex-1" />
         </div>
       </VCardTitle>
       <VDivider />
