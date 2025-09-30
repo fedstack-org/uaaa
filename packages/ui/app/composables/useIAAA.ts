@@ -1,10 +1,10 @@
-function getWindow(redirectUrl: string) {
+function getWindow(redirectUrl: string, mobile = false) {
   const url = new URL(redirectUrl)
   url.searchParams.set('stub', '1')
   redirectUrl = url.toString()
 
   // TODO: detech desktop browser and use window.open
-  const win = window.open(redirectUrl, 'iaaa', 'width=800,height=600')
+  const win = mobile ? null : window.open(redirectUrl, 'iaaa', 'width=800,height=600')
   if (win) return { client: win, close: () => win?.close() }
   const iframe = document.createElement('iframe')
   iframe.style.background = 'white'
@@ -24,6 +24,7 @@ const timeout = 60 * 1000 // 1 minute
 
 export const useIAAA = () => {
   const route = useRoute()
+  const { isMobile } = useDevice()
 
   async function getIAAATokenByRedirect(html: string) {
     if (route.query.token && typeof route.query.token === 'string') {
@@ -50,7 +51,7 @@ export const useIAAA = () => {
 
     if (nonInteractive && !crossOrigin) return getIAAATokenByRedirect(html)
 
-    const { client, close } = getWindow(redirectUrl)
+    const { client, close } = getWindow(redirectUrl, isMobile)
     if (!client) throw new Error('Failed to open IAAA window')
     const sameOrigin =
       typeof crossOrigin === 'boolean'
