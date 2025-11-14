@@ -4,7 +4,7 @@ import type { Document } from 'mongodb'
 import { nanoid } from 'nanoid'
 import { readFile } from 'node:fs/promises'
 import * as t from 'typanion'
-import { App } from '../index.js'
+import { App, type IUserClaims } from '../index.js'
 
 abstract class BaseCommand extends Command {
   configJson = Option.String(`--config-json`, {
@@ -222,44 +222,38 @@ class RegisterUserCommand extends BaseCommand {
   static usage = Command.Usage({})
 
   username = Option.String(`-u,--username`, { required: true })
-
-  email = Option.String(`-e,--email`, { required: true })
-  emailVerified = Option.Boolean(`-ev,--email-verified`, { required: true })
-
   claims = Option.Array(`-c,--claim`, { required: false, arity: 3 })
 
   async execute() {
     const app = await this.getApp()
     const now = Date.now()
+    const claims: IUserClaims = {
+      username: { value: this.username },
+      ...Object.fromEntries(
+        this.claims?.map(([name, value, verified]) => [
+          name,
+          {
+            value,
+            verified: ['1', 'true', 'verified'].includes(verified.toLowerCase()) ? true : undefined
+          }
+        ]) || []
+      )
+    }
     const { insertedId: userId } = await app.db.users.insertOne({
       _id: nanoid(),
-      claims: {
-        username: { value: this.username },
-        email: { value: this.email, verified: this.emailVerified || undefined },
-        ...Object.fromEntries(
-          this.claims?.map(([name, value, verified]) => [
-            name,
-            {
-              value,
-              verified: ['1', 'true', 'verified'].includes(verified.toLowerCase())
-                ? true
-                : undefined
-            }
-          ]) || []
-        )
-      },
+      claims,
       salt: nanoid()
     })
-    console.log(`User ${userId} registered username=${this.username} email=${this.email}`)
-    if (this.emailVerified) {
+    console.log(`User ${userId} registered username=${this.username} email=${claims.email?.value}`)
+    if (claims.email?.verified) {
       // Add email credential
       const { insertedId } = await app.db.credentials.insertOne({
         _id: nanoid(),
-        globalIdentifier: this.email,
+        globalIdentifier: claims.email.value,
         userIdentifier: '',
         userId: userId,
         type: 'email',
-        data: this.email,
+        data: claims.email.value,
         secret: '',
         remark: '',
         validAfter: now,
@@ -269,7 +263,27 @@ class RegisterUserCommand extends BaseCommand {
         updatedAt: now,
         securityLevel: 2
       })
-      console.log(`Credential ${insertedId} created for email ${this.email}`)
+      console.log(`Credential ${insertedId} created for email ${claims.email.value}`)
+    }
+    if (claims.phone?.verified) {
+      // Add phone credential
+      const { insertedId } = await app.db.credentials.insertOne({
+        _id: nanoid(),
+        globalIdentifier: claims.phone.value,
+        userIdentifier: '',
+        userId: userId,
+        type: 'sms',
+        data: claims.phone.value,
+        secret: '',
+        remark: '',
+        validAfter: now,
+        validBefore: now + 100 * 365 * 24 * 60 * 60 * 1000,
+        validCount: Number.MAX_SAFE_INTEGER,
+        createdAt: now,
+        updatedAt: now,
+        securityLevel: 3
+      })
+      console.log(`Credential ${insertedId} created for phone ${claims.phone.value}`)
     }
     await app.stop()
     console.log(`User ${userId} registered successfully`)
