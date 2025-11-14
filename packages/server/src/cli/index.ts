@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid'
 import { readFile } from 'node:fs/promises'
 import * as t from 'typanion'
 import { App, type IUserClaims } from '../index.js'
+import { rAppId } from '../util/index.js'
 
 abstract class BaseCommand extends Command {
   configJson = Option.String(`--config-json`, {
@@ -223,6 +224,8 @@ class RegisterUserCommand extends BaseCommand {
 
   username = Option.String(`-u,--username`, { required: true })
   claims = Option.Array(`-c,--claim`, { required: false, arity: 3 })
+  appWhitelist = Option.Array(`-aw,--app-whitelist`, { required: false })
+  appBlacklist = Option.Array(`-ab,--app-blacklist`, { required: false })
 
   async execute() {
     const app = await this.getApp()
@@ -239,10 +242,28 @@ class RegisterUserCommand extends BaseCommand {
         ]) || []
       )
     }
+    // Validate app IDs in whitelist
+    if (this.appWhitelist) {
+      for (const appId of this.appWhitelist) {
+        if (!rAppId.test(appId)) {
+          throw new Error(`Invalid app ID in whitelist: ${appId}`)
+        }
+      }
+    }
+    // Validate app IDs in blacklist
+    if (this.appBlacklist) {
+      for (const appId of this.appBlacklist) {
+        if (!rAppId.test(appId)) {
+          throw new Error(`Invalid app ID in blacklist: ${appId}`)
+        }
+      }
+    }
     const { insertedId: userId } = await app.db.users.insertOne({
       _id: nanoid(),
       claims,
-      salt: nanoid()
+      salt: nanoid(),
+      ...(this.appWhitelist && this.appWhitelist.length > 0 ? { appWhitelist: this.appWhitelist } : {}),
+      ...(this.appBlacklist && this.appBlacklist.length > 0 ? { appBlacklist: this.appBlacklist } : {})
     })
     console.log(`User ${userId} registered username=${this.username} email=${claims.email?.value}`)
     if (claims.email?.verified) {
