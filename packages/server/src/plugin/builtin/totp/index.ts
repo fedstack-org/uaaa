@@ -11,7 +11,8 @@ import { BusinessError, safeCompare } from '../../../util/index.js'
 import { definePlugin } from '../../_common.js'
 
 const tTOTPConfig = type({
-  'totpSecurityLevel?': tSecurityLevel
+  'totpSecurityLevel?': tSecurityLevel,
+  'totpDriftTolerance?': 'number'
 })
 
 type ITOTPConfig = typeof tTOTPConfig.infer
@@ -35,10 +36,12 @@ class TOTPImpl extends CredentialImpl {
   readonly type = 'totp'
 
   newCredentialSecurityLevel
+  totpDriftTolerance
 
   constructor(public config: ITOTPConfig) {
     super()
     this.newCredentialSecurityLevel = config.totpSecurityLevel ?? SECURITY_LEVEL.HIGH
+    this.totpDriftTolerance = config.totpDriftTolerance ?? 0.1
   }
 
   override async showLogin(ctx: CredentialContext) {
@@ -77,8 +80,21 @@ class TOTPImpl extends CredentialImpl {
       throw new BusinessError('NOT_FOUND', { msg: 'TOTP credential not found' })
     }
 
-    const { otp } = TOTP.generate(credential.secret as string)
-    if (!safeCompare(payload.code, otp)) {
+    const now = Date.now()
+    const period = 30 * 1000 // Default period is 30s
+    const { otp, expires } = TOTP.generate(credential.secret as string)
+    let isValid = safeCompare(payload.code, otp)
+
+    if (!isValid && period - (expires - now) < period * this.totpDriftTolerance) {
+      const { otp: lastOtp } = TOTP.generate(credential.secret as string, {
+        timestamp: now - period
+      })
+      if (safeCompare(payload.code, lastOtp)) {
+        isValid = true
+      }
+    }
+
+    if (!isValid) {
       throw new BusinessError('FORBIDDEN', { msg: 'Invalid TOTP code' })
     }
 
