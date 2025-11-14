@@ -11,7 +11,8 @@ import { BusinessError, safeCompare } from '../../../util/index.js'
 import { definePlugin } from '../../_common.js'
 
 const tTOTPConfig = type({
-  'totpSecurityLevel?': tSecurityLevel
+  'totpSecurityLevel?': tSecurityLevel,
+  'totpDriftTolerance?': 'number'
 })
 
 type ITOTPConfig = typeof tTOTPConfig.infer
@@ -35,10 +36,16 @@ class TOTPImpl extends CredentialImpl {
   readonly type = 'totp'
 
   newCredentialSecurityLevel
+  totpDriftTolerance: number
 
   constructor(public config: ITOTPConfig) {
     super()
     this.newCredentialSecurityLevel = config.totpSecurityLevel ?? SECURITY_LEVEL.HIGH
+    const driftTolerance = config.totpDriftTolerance ?? 0.1
+    if (driftTolerance < 0 || driftTolerance > 0.5) {
+      throw new Error('totpDriftTolerance must be between 0 and 0.5')
+    }
+    this.totpDriftTolerance = driftTolerance
   }
 
   override async showLogin(ctx: CredentialContext) {
@@ -77,8 +84,39 @@ class TOTPImpl extends CredentialImpl {
       throw new BusinessError('NOT_FOUND', { msg: 'TOTP credential not found' })
     }
 
-    const { otp } = TOTP.generate(credential.secret as string)
-    if (!safeCompare(payload.code, otp)) {
+    const now = Date.now()
+    const period = 30 * 1000 // Default period is 30s
+    const { otp, expires } = TOTP.generate(credential.secret as string, { timestamp: now })
+    let isValid = safeCompare(payload.code, otp)
+
+    if (!isValid) {
+      const timeElapsedInPeriod = now - (expires - period)
+      // Case 1: User's clock is slower than server's.
+      // The server just generated a new code, but the user's device is still showing the previous one.
+      // This happens at the beginning of the period.
+      if (timeElapsedInPeriod < period * this.totpDriftTolerance) {
+        const { otp: lastOtp } = TOTP.generate(credential.secret as string, {
+          timestamp: now - period
+        })
+        if (safeCompare(payload.code, lastOtp)) {
+          isValid = true
+        }
+      }
+      // Case 2: User's clock is faster than server's.
+      // The user's device has already generated the next code, while the server is still in the current period.
+      // This happens at the end of the period.
+      const timeRemainingInPeriod = expires - now
+      if (!isValid && timeRemainingInPeriod < period * this.totpDriftTolerance) {
+        const { otp: nextOtp } = TOTP.generate(credential.secret as string, {
+          timestamp: now + period
+        })
+        if (safeCompare(payload.code, nextOtp)) {
+          isValid = true
+        }
+      }
+    }
+
+    if (!isValid) {
       throw new BusinessError('FORBIDDEN', { msg: 'Invalid TOTP code' })
     }
 
