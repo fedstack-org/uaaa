@@ -14,27 +14,14 @@ export default defineConfig({
 
         nav: [
           { text: '首页', link: '/' },
-          { text: '用户指南', link: '/user-guide' }
+          { text: 'English', link: '/en/' }
         ],
 
         sidebar: [
           {
-            text: '用户指南',
-            link: '/user-guide',
+            text: '文档',
             items: [
-              { text: '基础概念', link: '/concepts' },
-              { text: '凭据类型', link: '/credentials' },
-              { text: '会话管理', link: '/session-management' },
-              { text: '安全措施', link: '/security' }
-            ]
-          },
-          {
-            text: '开始使用',
-            link: '/getting-started',
-            items: [
-              { text: '系统架构', link: '/architecture' },
-              { text: '插件开发', link: '/develop-plugins' },
-              { text: '应用接入', link: '/application-integration' }
+              { text: '(English documentation only)', link: '/en/' }
             ]
           }
         ]
@@ -44,33 +31,74 @@ export default defineConfig({
       label: 'English',
       lang: 'en',
       themeConfig: {
+        logo: '/logo.svg',
+
         nav: [
           { text: 'Home', link: '/en/' },
-          { text: 'User Guide', link: '/en/user-guide' }
+          { text: 'Docs', link: '/en/architecture' },
+          { text: 'Guides', link: '/en/deployment' }
         ],
 
         sidebar: [
           {
-            text: 'User Guide',
-            link: '/en/user-guide',
+            text: 'Getting Started',
+            collapsed: false,
             items: [
-              { text: 'Concepts', link: '/en/concepts' },
-              { text: 'Credentials', link: '/en/credentials' },
-              { text: 'Session Management', link: '/en/session-management' },
-              { text: 'Security', link: '/en/security' }
+              { text: 'Introduction', link: '/en/' },
+              { text: 'Architecture', link: '/en/architecture' },
+              { text: 'OAuth2 Compatibility', link: '/en/oauth2-compatibility' },
+              { text: 'Deployment', link: '/en/deployment' }
             ]
           },
           {
-            text: 'Getting Started',
-            link: '/en/getting-started',
+            text: 'Configuration & Operations',
+            collapsed: false,
             items: [
-              { text: 'Architecture', link: '/en/architecture' },
-              { text: 'Develop Plugins', link: '/en/develop-plugins' },
-              { text: 'Application Integration', link: '/en/application-integration' }
+              { text: 'Configuration Reference', link: '/en/configuration' },
+              { text: 'Maintenance & Operations', link: '/en/maintenance' }
+            ]
+          },
+          {
+            text: 'Plugin System',
+            collapsed: false,
+            items: [
+              { text: 'Plugin Ecosystem', link: '/en/plugins/' },
+              { text: 'Developing Plugins', link: '/en/plugins/developing-plugins' }
+            ]
+          },
+          {
+            text: 'Integration Guides',
+            collapsed: false,
+            items: [
+              { text: 'OAuth2 & OIDC Standard', link: '/en/integrations/oauth2-oidc' },
+              { text: 'PreAuth + NonInteractive', link: '/en/integrations/pre-auth' },
+              { text: 'PreferType + NonInteractive', link: '/en/integrations/prefer-type' }
             ]
           }
-        ]
+        ],
+
+        socialLinks: [
+          { icon: 'github', link: 'https://github.com/fedstack-org/uaaa' }
+        ],
+
+        footer: {
+          message: 'Released under the MIT License.',
+          copyright: 'Copyright © 2024-present UAAA Team'
+        },
+
+        search: {
+          provider: 'local'
+        }
       }
     }
+  },
+
+  themeConfig: {
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/fedstack-org/uaaa' }
+    ]
   }
+
+  // Note: Mermaid diagrams are supported natively in VitePress 1.0+
+  // Simply use ```mermaid code blocks in markdown files
 })

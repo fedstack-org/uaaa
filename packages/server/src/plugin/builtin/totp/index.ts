@@ -77,7 +77,7 @@ class TOTPImpl extends CredentialImpl {
       throw new BusinessError('NOT_FOUND', { msg: 'TOTP credential not found' })
     }
 
-    const { otp } = TOTP.generate(credential.secret as string)
+    const { otp } = await TOTP.generate(credential.secret as string)
     if (!safeCompare(payload.code, otp)) {
       throw new BusinessError('FORBIDDEN', { msg: 'Invalid TOTP code' })
     }
@@ -100,7 +100,7 @@ class TOTPImpl extends CredentialImpl {
       throw new BusinessError('INVALID_TYPE', { summary: payload.summary })
     }
 
-    const { otp } = TOTP.generate(payload.secret)
+    const { otp } = await TOTP.generate(payload.secret)
     if (!safeCompare(payload.code, otp)) {
       throw new BusinessError('BAD_REQUEST', { msg: 'Invalid TOTP code' })
     }

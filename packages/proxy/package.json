@@ -24,21 +24,21 @@
     "@fastify/cookie": "^11.0.2",
     "@fastify/http-proxy": "^11.3.0",
     "@fastify/sensible": "^6.0.3",
-    "@fastify/session": "^11.1.0",
-    "@hono/node-server": "^1.19.1",
+    "@fastify/session": "^11.1.1",
+    "@hono/node-server": "^1.19.6",
     "@uaaa/core": "workspace:^",
-    "arktype": "^2.1.22",
+    "arktype": "^2.1.26",
     "clipanion": "^4.0.0-rc.4",
-    "fastify": "^5.5.0",
-    "hono": "^4.9.6",
+    "fastify": "^5.6.2",
+    "hono": "^4.10.5",
     "hookable": "^5.5.3",
-    "jose": "^6.1.0",
-    "pino": "^9.9.2",
+    "jose": "^6.1.1",
+    "pino": "^10.1.0",
     "typanion": "^3.14.0"
   },
   "devDependencies": {
     "@uaaa/server": "workspace:^",
     "concurrently": "^9.2.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   }
 }
