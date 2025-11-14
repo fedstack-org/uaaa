@@ -926,4 +926,4 @@ High availability with load balancing.
 - **[Deployment](./deployment)**: Deploy UAAA to production
 - **[Configuration](./configuration)**: Configure UAAA settings
 - **[Plugin Development](./plugins/developing-plugins)**: Create custom plugins
-- **[OAuth2 Guide](./oauth2)**: Implement OAuth2 integration
+- **[OAuth2 Guide](./integrations/oauth2-oidc)**: Implement OAuth2 integration

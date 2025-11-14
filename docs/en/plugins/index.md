@@ -76,8 +76,6 @@ npm install @pku-uaaa/plugin-iaaa
 }
 ```
 
-See [IAAA Plugin Guide](./iaaa-plugin) for details.
-
 ## Plugin Architecture
 
 ### Plugin Interface
@@ -320,5 +318,4 @@ Before installing third-party plugins:
 ## Next Steps
 
 - **[Developing Plugins](./developing-plugins)**: Create your own plugins
-- **[IAAA Plugin](./iaaa-plugin)**: Example external plugin
 - **[Configuration](../configuration)**: Configure plugins

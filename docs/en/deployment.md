@@ -241,4 +241,4 @@ ports:
 
 - **[Configuration Reference](./configuration)**: Complete configuration options
 - **[Maintenance Guide](./maintenance)**: Backup and monitoring
-- **[Integration Guides](./integrations/)**: Integrate applications with UAAA
+- **[Integration Guides](./integrations/oauth2-oidc)**: Integrate applications with UAAA

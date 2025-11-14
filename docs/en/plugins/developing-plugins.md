@@ -616,5 +616,4 @@ npm publish --access public
 ## Next Steps
 
 - **[Plugin Ecosystem](./index)**: Browse existing plugins
-- **[IAAA Plugin Example](./iaaa-plugin)**: Real-world plugin example
 - **[Architecture](../architecture)**: Understand UAAA internals

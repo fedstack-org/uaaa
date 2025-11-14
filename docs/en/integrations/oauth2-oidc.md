@@ -575,4 +575,3 @@ async function refreshAccessToken(refreshToken) {
 
 - **[PreAuth Integration](./pre-auth)**: Silent authentication for external identity
 - **[PreferType Integration](./prefer-type)**: Specify preferred credential type
-- **[Nuxt Integration](./nuxt)**: Using @uaaa/nuxt module

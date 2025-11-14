@@ -139,7 +139,7 @@ Visit `http://localhost:3000` to access the UAAA interface.
 - **[Deployment](./deployment)**: Deploy UAAA to production
 - **[Configuration](./configuration)**: Configure UAAA for your environment
 - **[Plugin Development](./plugins/developing-plugins)**: Create custom authentication plugins
-- **[Integration Guides](./integrations/)**: Integrate your applications with UAAA
+- **[Integration Guides](./integrations/oauth2-oidc)**: Integrate your applications with UAAA
 
 ## Community and Support
 
