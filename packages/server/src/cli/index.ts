@@ -4,6 +4,7 @@ import type { Document } from 'mongodb'
 import { nanoid } from 'nanoid'
 import { readFile } from 'node:fs/promises'
 import * as t from 'typanion'
+import bcrypt from 'bcrypt'
 import { App, type IUserClaims } from '../index.js'
 import { rAppId } from '../util/index.js'
 
@@ -223,9 +224,11 @@ class RegisterUserCommand extends BaseCommand {
   static usage = Command.Usage({})
 
   username = Option.String(`-u,--username`, { required: true })
+  password = Option.String(`-p,--password`, { required: false })
   claims = Option.Array(`-c,--claim`, { required: false, arity: 3 })
   appWhitelist = Option.Array(`-aw,--app-whitelist`, { required: false })
   appBlacklist = Option.Array(`-ab,--app-blacklist`, { required: false })
+  isAdmin = Option.Boolean(`-a,--admin`, { required: false })
 
   async execute() {
     const app = await this.getApp()
@@ -241,6 +244,10 @@ class RegisterUserCommand extends BaseCommand {
           }
         ]) || []
       )
+    }
+    // Add admin claim if specified
+    if (this.isAdmin) {
+      claims.is_admin = { value: 'true', verified: true }
     }
     // Validate app IDs in whitelist
     if (this.appWhitelist) {
@@ -305,6 +312,27 @@ class RegisterUserCommand extends BaseCommand {
         securityLevel: 3
       })
       console.log(`Credential ${insertedId} created for phone ${claims.phone.value}`)
+    }
+    if (this.password) {
+      // Add password credential
+      const hashedPassword = await bcrypt.hash(this.password, 10)
+      const { insertedId } = await app.db.credentials.insertOne({
+        _id: nanoid(),
+        globalIdentifier: '',
+        userIdentifier: '',
+        userId: userId,
+        type: 'password',
+        data: '',
+        secret: hashedPassword,
+        remark: '',
+        validAfter: now,
+        validBefore: now + 100 * 365 * 24 * 60 * 60 * 1000,
+        validCount: Number.MAX_SAFE_INTEGER,
+        createdAt: now,
+        updatedAt: now,
+        securityLevel: 2
+      })
+      console.log(`Credential ${insertedId} created for password`)
     }
     await app.stop()
     console.log(`User ${userId} registered successfully`)

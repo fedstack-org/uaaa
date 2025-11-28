@@ -1,0 +1,228 @@
+uaaa: UAAA系统
+client-for: '{0}客户端'
+
+pages:
+  index: 首页
+  current: 当前会话
+  session: 会话管理
+  app: 应用管理
+  credential: 凭据管理
+  setting: 用户设置
+  authorize: 用户确认
+  remote-authorize: 远程授权
+  logout: 登出
+  farewell: 即将进入
+  auth:
+    signin: 登录
+    signout: 登出
+    verify: 验证
+    redirect: 重定向
+  console:
+    index: 后台管理
+    user: 用户管理
+    app: 应用管理
+    setting: 系统设置
+
+credentials:
+  password: 密码
+  passkey: 通行密钥
+  phone: 手机
+  sms: 短信
+  email: 邮箱
+  webauthn: 通行密钥
+  iaaa: 北京大学统一身份认证
+  totp: 手机令牌
+
+actions:
+  submit: 提交
+  login: 登录
+  verify: 验证
+  bind: 绑定
+  unbind: 解绑
+  rebind: 重新绑定
+  edit-remark: 编辑备注
+  cancel: 取消
+  save: 保存
+  add-credential: 添加凭据
+  edit: 编辑{0}
+  reset: 重置
+  back: 返回
+  add: 添加
+  install: 配置
+  authorize: 进入应用
+  terminate: 吊销
+  confirm: 确认
+  continue: 继续
+  send-otp: 发送验证码
+  goto: 转到{target}
+  logout: 登出
+  switch-account: 切换账号
+  close: 关闭
+
+msg:
+  id: ID
+  value: 值
+  field: 字段
+  navigation: 导航
+  session-info: 会话信息
+  loading: 加载中...
+  user-profile: 用户信息
+  claim-name: 信息名称
+  claim-value: 信息值
+  claim: 信息
+  verified: 已验证
+  not-verified: 未验证
+  no-permissions: 无权限
+  disabled: 已禁用
+  enabled: 已启用
+  console-welcome: 欢迎使用管理控制台
+  last-active-at: 最后活跃时间
+  invalid-json: JSON格式错误
+  user-menu: 用户菜单
+  system-settings: 系统设置
+  actions: 操作
+  login-by: 通过{0}登录
+  verify-by: 通过{0}验证
+  credentials: 凭据管理
+  credential-type: '{0}凭据'
+  current-security-level: 安全级别：{0}
+  account-security-level: '账户安全级别：{0}'
+  upgrade-security-level-to: 提升安全级别至：{0}
+  credential-id: 凭据ID
+  credential-user-identifier: 用户标识
+  credential-global-identifier: 全局标识
+  unbind-confirm: 确认解绑凭据？
+  unknown-credential-type: 不支持的凭据类别
+  user-settings: 用户设置
+  task-succeeded: 操作成功
+  task-failed: 操作失败
+  manage-session: 会话管理
+  tips: 提示
+  not-implemented: 功能尚未实现
+  login-methods: 登录方式
+  verify-methods: 验证方式
+  no-login-methods: 没有可用的登录方式
+  no-verify-methods: 没有可用的验证方式
+  no-verify-methods-hint: |
+    您还没有绑定足够安全的凭据，暂时无法访问此功能
+    请您及时转至凭据管理页面绑定推荐的凭据
+  downgrade-security-level: 降低安全级别
+  security-level: 安全级别
+  app: 应用
+  request-for: 用途：{0}
+  install-app: 配置应用
+  permissions: 权限
+  claims: 用户信息
+  grants: 授权
+  manage-app: 应用管理
+  app-not-found: 应用不存在
+  unsupported-connector: 不支持的授权方式
+  authorize-warn: 点击进入应用，以当前用户身份继续使用{app}
+  bad-arguments: 参数错误
+  app-not-installed: 应用未配置
+  redirecting: 正在重定向...
+  use-local-authenticator: 使用本地凭据
+  no-app-installed: 没有配置任何应用
+  session-list: 会话列表
+  session-id: 会话ID
+  session-token-count: 令牌数量
+  session-authorized-apps: 已授权应用
+  terminated: 已终止
+  expired: 已过期
+  active: 活跃
+  inactive: 未激活
+  expires-at: 过期时间
+  created-at: 创建时间
+  view: 查看
+  token-list: 令牌列表
+  token-id: 令牌ID
+  token-index: 序号
+  target-app: 目标应用
+  client-app: 使用应用
+  do-in-seconds: '{0}秒后执行{1}'
+  missing-required-claims: '缺少必要的信息：{0}'
+  missing-verified-claims: '缺少已验证的信息：{0}'
+  missing-required-permissions: '缺少必要的权限：{0}'
+  task-failed-with: '任务失败：{0}'
+  will-grant-permission-for: 将授予下列权限，用途为：
+  will-grant-claim-for: 将授予该信息，用途为：
+  required: 必选
+  show-grant: 查看权限
+  hide-grant: 隐藏授权细节
+  current-session: 当前会话
+  current-user: 当前用户
+  other-users: 其他用户
+  confirm-operation: 确认进行操作？该操作无法撤销！
+  user-id: 用户ID
+  user-list: 用户列表
+  username: 用户名
+  is-disabled: 是否禁用
+  scan-qrcode-to-authorize: 扫描二维码以授权
+  or-visit: 或访问
+  and-type-code-below: 并输入下方的授权码
+  start-remote-authorize: 授权
+  user-code: 授权码
+  scanned: 授权设备连接成功，等待授权结果中...
+  remote-connected: 远程设备连接成功
+  remote-warn: |
+    您正在进行远程授权操作，请仔细鉴别如下信息：
+    1. 远程设备上的授权码是否为{code}
+    2. 远程设备上的页面地址是否和本页面的地址一致
+    请勿将授权码告知他人
+  email-email-hint: |
+    第一步：
+    输入邮箱地址并发送验证码
+  email-otp-hint: |
+    第二步：
+    输入邮箱收到的数字验证码
+  sms-phone-hint: |
+    第一步：
+    输入手机号码并发送验证码
+  sms-otp-hint: |
+    第二步：
+    输入短信中收到的数字验证码
+
+claims:
+  username: 用户名
+  email: 邮箱
+  realname: 真实姓名
+  phone: 手机
+  avatar_hash: 头像标识
+  is_admin: 是否管理员
+  'iaaa:name': IAAA姓名
+  'iaaa:status': IAAA状态
+  'iaaa:identity_id': 学工号
+  'iaaa:dept_id': IAAA部门ID
+  'iaaa:dept': IAAA部门
+  'iaaa:identity_type': IAAA身份类型
+  'iaaa:detail_type': IAAA详细类型
+  'iaaa:identity_status': IAAA身份状态
+  'iaaa:campus': 校区
+
+securityLevel:
+  0: 需要验证
+  1: 低
+  2: 中
+  3: 高
+  4: 安全设备
+
+console:
+  app-list: 应用列表
+  add-app: 添加应用
+
+errors:
+  api:
+    unknown: API错误{code}
+    INSUFFICIENT_SECURITY_LEVEL: 需要更高的安全级别
+    INSUFFICIENT_PERMISSION: 权限不足
+    REQUIRE_ADMIN: 需要管理员权限
+    INVALID_OPERATION: 无效操作
+    INVALID_TYPE: 错误的输入格式
+    NOT_FOUND: 未找到
+    BAD_REQUEST: 错误请求：{msg}
+    FORBIDDEN: 禁止访问：{msg}
+    TOO_MANY_REQUESTS: 请求过于频繁：{msg}
+  api-hint:
+    INSUFFICIENT_SECURITY_LEVEL: 正在转向验证页面
+  error: 发生错误：{message}
+  unknown: 未知错误
