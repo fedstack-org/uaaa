@@ -55,6 +55,7 @@ export default defineConfig({
             collapsed: false,
             items: [
               { text: 'Configuration Reference', link: '/en/configuration' },
+              { text: 'App Manifest', link: '/en/manifest' },
               { text: 'Maintenance & Operations', link: '/en/maintenance' }
             ]
           },
