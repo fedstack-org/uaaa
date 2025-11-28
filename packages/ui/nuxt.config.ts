@@ -1,5 +1,7 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
+const { host: SERVER_HOST, protocol: SERVER_PROTOCOL } = new URL(process.env.SERVER_BASE || 'http://localhost:3030')
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   ssr: false,
@@ -23,9 +25,9 @@ export default defineNuxtConfig({
   vite: { vue: { template: { transformAssetUrls } } },
   nitro: {
     devProxy: {
-      '/api': 'http://localhost:3030/api',
-      '/oauth': 'http://localhost:3030/oauth',
-      '/.well-known': 'http://localhost:3030/.well-known'
+      '/api': `${SERVER_PROTOCOL}//${SERVER_HOST}/api`,
+      '/oauth': `${SERVER_PROTOCOL}//${SERVER_HOST}/oauth`,
+      '/.well-known': `${SERVER_PROTOCOL}//${SERVER_HOST}/.well-known`
     }
   },
   i18n: {
