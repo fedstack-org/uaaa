@@ -104,6 +104,7 @@ msg:
   authorize-warn: By clicking Authorize, you will grant the application the permissions you set. Continue?
   bad-arguments: Invalid Arguments
   app-not-installed: Application Not Configured
+  insufficient-permission: Missing required permissions, please update your grants
   redirecting: Redirecting...
   use-local-authenticator: Use Local Credentials
   no-app-installed: No Applications Configured
@@ -131,6 +132,9 @@ msg:
   will-grant-permission-for: 'The following permissions will be granted for the purpose of:'
   will-grant-claim-for: 'This information will be granted for the purpose of:'
   required: Required
+  perm-granted-and-used: Granted & used this session
+  perm-auto-granted: Auto-enabled for this session
+  perm-optional-requested: Optionally requested
   show-grant: Show Authorization Details
   hide-grant: Hide Authorization Details
   current-session: Current Session

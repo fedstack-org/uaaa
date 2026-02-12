@@ -104,6 +104,7 @@ msg:
   authorize-warn: 点击进入应用，以当前用户身份继续使用{app}
   bad-arguments: 参数错误
   app-not-installed: 应用未配置
+  insufficient-permission: 缺少所需权限，请更新授权
   redirecting: 正在重定向...
   use-local-authenticator: 使用本地凭据
   no-app-installed: 没有配置任何应用
@@ -131,6 +132,9 @@ msg:
   will-grant-permission-for: 将授予下列权限，用途为：
   will-grant-claim-for: 将授予该信息，用途为：
   required: 必选
+  perm-granted-and-used: 已授权且本次使用
+  perm-auto-granted: 本次需要，已自动勾选
+  perm-optional-requested: 本次可选
   show-grant: 查看权限
   hide-grant: 隐藏授权细节
   current-session: 当前会话

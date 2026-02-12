@@ -12,7 +12,8 @@ export class OAuthError extends HTTPException {
       | 'authorization_pending'
       | 'slow_down'
       | 'access_denied'
-      | 'expired_token',
+      | 'expired_token'
+      | 'invalid_client_metadata',
     options?: {
       description?: string
       uri?: string

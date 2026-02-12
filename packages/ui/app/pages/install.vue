@@ -25,6 +25,8 @@
             v-model:claims="claims"
             v-model:permissions="permissions"
             :app="app"
+            :redirect-permissions="redirectPermissions"
+            :redirect-optional-permissions="redirectOptionalPermissions"
             fill-required
           />
           <VDivider />
@@ -56,6 +58,18 @@ const route = useRoute()
 const toast = useToast()
 const permissions = ref<Record<string, boolean>>({})
 const claims = ref<Record<string, boolean>>({})
+
+const authorizeParams = computed(() => {
+  const redirect = route.query.redirect
+  if (typeof redirect !== 'string') return null
+  const resolved = router.resolve(redirect)
+  if (!resolved.path.startsWith('/authorize')) return null
+  const params = parseAuthorizeParams(resolved.query)
+  if ('error' in params) return null
+  return params
+})
+const redirectPermissions = computed(() => authorizeParams.value?.permissions ?? [])
+const redirectOptionalPermissions = computed(() => authorizeParams.value?.optionalPermissions ?? [])
 
 const { data: app } = useApp(appId)
 

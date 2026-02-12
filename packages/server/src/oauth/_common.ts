@@ -5,7 +5,8 @@ import type { Context } from 'hono'
 import jwt from 'jsonwebtoken'
 import ms from 'ms'
 import { createHash } from 'node:crypto'
-import type { App, ClaimName, IAppDoc, IUserClaims } from '../index.js'
+import RE2 from 're2'
+import type { App, ClaimName, IAppDcrMatcher, IAppDoc, IUserClaims } from '../index.js'
 import { tRemoteRequest, type RemoteRequest } from '../session/index.js'
 import { Permission, rAppId, safeCompare } from '../util/index.js'
 import { OAuthError } from './_errors.js'
@@ -14,6 +15,7 @@ export interface IOAuthWellKnownMetadata {
   issuer: string
   authorization_endpoint: string
   token_endpoint: string
+  registration_endpoint: string
   end_session_endpoint: string
   jwks_uri: string
   userinfo_endpoint: string
@@ -69,6 +71,17 @@ export class OAuthManager {
     exp: 'number',
     iat: 'number'
   })
+  // RFC 7591
+  static tDCRRequest = type({
+    'client_name?': 'string',
+    'redirect_uris?': 'string[]',
+    'grant_types?': 'string[]',
+    'response_types?': 'string[]',
+    'token_endpoint_auth_method?': 'string',
+    'scope?': 'string',
+    'software_id?': 'string',
+    'software_version?': 'string'
+  })
 
   private _base
   private _grants: Record<string, GrantFn<any>> = Object.create(null)
@@ -113,7 +126,14 @@ export class OAuthManager {
           this._checkClientPKCE(ctx, tokenDoc.challenge, request.code_verifier)
         }
 
-        if (request.redirect_uri && !client.app.callbackUrls.includes(request.redirect_uri)) {
+        if (
+          request.redirect_uri &&
+          !this.matchCallbackUrl(
+            request.redirect_uri,
+            client.app.callbackUrls,
+            client.app.openid?.ignoreLocalhostCallbackPort
+          )
+        ) {
           throw new OAuthError('invalid_grant', { description: 'Bad redirect_uri' })
         }
 
@@ -265,6 +285,7 @@ export class OAuthManager {
       issuer: this._base,
       authorization_endpoint: this._relativeUrl('/oauth/authorize'),
       token_endpoint: this._relativeUrl('/oauth/token'),
+      registration_endpoint: this._relativeUrl('/oauth/register'),
       end_session_endpoint: this._relativeUrl('/oauth/logout'),
       jwks_uri: this._relativeUrl('/api/public/jwks'),
       userinfo_endpoint: this._relativeUrl('/oauth/userinfo'),
@@ -565,5 +586,94 @@ export class OAuthManager {
       return ctx.body('')
     }
     return this.generateClaims(ctx, ctx.var.token.client_id, ctx.var.token.sub)
+  }
+
+  matchCallbackUrl(url: string, allowlist: string[] = [], ignoreLocalhostPort = false): boolean {
+    if (allowlist.includes(url)) return true
+    if (!ignoreLocalhostPort) return false
+    try {
+      const parsed = new URL(url)
+      if (parsed.hostname !== 'localhost') return false
+      parsed.port = ''
+      const stripped = parsed.toString()
+      return allowlist.some((entry) => {
+        try {
+          const p = new URL(entry)
+          if (p.hostname !== 'localhost') return false
+          p.port = ''
+          return p.toString() === stripped
+        } catch {
+          return false
+        }
+      })
+    } catch {
+      return false
+    }
+  }
+
+  private _dcrMatch(pattern: string, value: string): boolean {
+    if (pattern.startsWith('/') && pattern.endsWith('/') && pattern.length > 2) {
+      try {
+        return new RE2(pattern.slice(1, -1)).test(value)
+      } catch {
+        return false
+      }
+    }
+    return pattern === value
+  }
+
+  private _dcrMatchApp(
+    dcr: IAppDcrMatcher,
+    softwareId?: string,
+    clientName?: string
+  ): 'software_id' | 'client_name' | null {
+    if (softwareId && dcr.softwareIds?.some((p) => this._dcrMatch(p, softwareId))) {
+      return 'software_id'
+    }
+    if (clientName && dcr.clientNames?.some((p) => this._dcrMatch(p, clientName))) {
+      return 'client_name'
+    }
+    return null
+  }
+
+  // RFC 7591
+  async handleRegistrationRequest(ctx: Context, body: unknown) {
+    const request = OAuthManager.tDCRRequest(body)
+    if (request instanceof type.errors) {
+      throw new OAuthError('invalid_client_metadata', { description: 'Invalid request body' })
+    }
+
+    const apps = await this.app.db.apps
+      .find({ dcr: { $exists: true }, disabled: { $ne: true } })
+      .toArray()
+
+    apps.sort((a, b) => (b.dcr?.priority ?? 0) - (a.dcr?.priority ?? 0))
+
+    type Match = { app: IAppDoc; by: 'software_id' | 'client_name' }
+    let match: Match | null = null
+
+    for (const app of apps) {
+      if (!app.dcr) continue
+      const by = this._dcrMatchApp(app.dcr, request.software_id, request.client_name)
+      if (by) {
+        if (!match || by === 'software_id') {
+          match = { app, by }
+          if (by === 'software_id') break
+        }
+      }
+    }
+
+    if (!match) {
+      throw new OAuthError('invalid_client_metadata', {
+        description: 'No matching application found'
+      })
+    }
+
+    return {
+      ...request,
+      client_id: match.app._id,
+      client_id_issued_at: 0,
+      token_endpoint_auth_method: 'none'
+    }
   }
 }

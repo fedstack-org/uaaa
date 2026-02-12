@@ -113,6 +113,16 @@ const { run: authorize, running } = useTask(async () => {
             }
           })
           return symNoToast
+        case 'INSUFFICIENT_PERMISSION':
+          toast.error(t('msg.insufficient-permission'))
+          router.replace({
+            path: '/install',
+            query: {
+              appId: props.params.appId,
+              redirect: route.fullPath
+            }
+          })
+          return symNoToast
       }
     }
     throw err
@@ -173,6 +183,16 @@ const tryAuthorize = async () => {
             }
           })
           return
+        case 'INSUFFICIENT_PERMISSION':
+          toast.error(t('msg.insufficient-permission'))
+          router.replace({
+            path: '/install',
+            query: {
+              appId: props.params.appId,
+              redirect: route.fullPath
+            }
+          })
+          return
         case 'INSUFFICIENT_SECURITY_LEVEL':
           router.replace({
             path: '/auth/verify',
@@ -193,7 +213,7 @@ const stopAppWatcher = watch(
   app,
   (app) => {
     if (!app) return
-    stopAppWatcher()
+    nextTick(() => stopAppWatcher())
     tryAuthorize()
   },
   { immediate: true }

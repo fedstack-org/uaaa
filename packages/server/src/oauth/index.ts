@@ -11,6 +11,10 @@ export const oauthWellKnownRouter = new Hono()
   .get('/openid-configuration', async (ctx) => {
     return ctx.json(await ctx.var.app.oauth.getMetadata())
   })
+  // RFC 8414 OAuth 2.0 Authorization Server Metadata
+  .get('/oauth-authorization-server', async (ctx) => {
+    return ctx.json(await ctx.var.app.oauth.getMetadata())
+  })
 
 export const oauthRouter = new Hono()
   // OIDC Authorization Endpoint
@@ -58,6 +62,14 @@ export const oauthRouter = new Hono()
   // Device Authorization Endpoint
   .post('/device/code', arktypeValidator('form', type('Record<string,string>')), async (ctx) => {
     const response = await ctx.var.app.oauth.handleDeviceCodeRequest(ctx, ctx.req.valid('form'))
+    return ctx.json(response)
+  })
+
+  // RFC 7591 Dynamic Client Registration
+  .post('/register', async (ctx) => {
+    const body = await ctx.req.json()
+    const response = await ctx.var.app.oauth.handleRegistrationRequest(ctx, body)
+    ctx.status(201)
     return ctx.json(response)
   })
 

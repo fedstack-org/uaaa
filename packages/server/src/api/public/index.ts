@@ -71,14 +71,15 @@ export const publicApi = new Hono()
       if (!app) {
         throw new BusinessError('NOT_FOUND', { msg: 'App not found' })
       }
+      const ignorePort = app.openid?.ignoreLocalhostCallbackPort
       switch (type) {
         case 'authorize':
-          if (!app.callbackUrls.includes(url)) {
+          if (!ctx.var.app.oauth.matchCallbackUrl(url, app.callbackUrls, ignorePort)) {
             throw new BusinessError('BAD_REQUEST', { msg: 'Invalid redirect url' })
           }
           break
         case 'logout':
-          if (!app.openid?.logoutUrls?.includes(url)) {
+          if (!ctx.var.app.oauth.matchCallbackUrl(url, app.openid?.logoutUrls, ignorePort)) {
             throw new BusinessError('BAD_REQUEST', { msg: 'Invalid redirect url' })
           }
           break

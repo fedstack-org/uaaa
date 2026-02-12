@@ -38,7 +38,8 @@ export const tAppOpenIdConfig = type({
   'additionalClaims?': 'Record<string,string>',
   'allowPublicClient?': 'boolean',
   'defaultPublicClient?': 'boolean',
-  'logoutUrls?': 'string[]'
+  'logoutUrls?': 'string[]',
+  'ignoreLocalhostCallbackPort?': 'boolean'
 })
 export type IAppOpenIdConfig = typeof tAppOpenIdConfig.infer
 
@@ -46,6 +47,13 @@ export const tChangelogItem = type({
   versionName: 'string',
   content: 'string'
 })
+
+export const tAppDcrMatcher = type({
+  'softwareIds?': 'string[]',
+  'clientNames?': 'string[]',
+  'priority?': 'number'
+})
+export type IAppDcrMatcher = typeof tAppDcrMatcher.infer
 
 export const tDelegationConfig = type({
   userId: 'string',
@@ -69,9 +77,21 @@ export const tAppManifest = type({
   'config?': tAppGeneralConfig,
   'openid?': tAppOpenIdConfig,
   'delegation?': tDelegationConfig,
+  'dcr?': tAppDcrMatcher,
   securityLevel: tSecurityLevel,
   'baseSecurityLevel?': tSecurityLevel
-}).narrow((manifest) => manifest.version === manifest.changelog.length)
+}).narrow((manifest, ctx) => {
+  if (manifest.version !== manifest.changelog.length) {
+    return ctx.reject({ expected: 'version to equal changelog length' })
+  }
+  if (manifest.dcr && !manifest.openid?.allowPublicClient && !manifest.openid?.defaultPublicClient) {
+    return ctx.reject({
+      expected: 'openid.allowPublicClient or openid.defaultPublicClient when dcr is set',
+      path: ['dcr']
+    })
+  }
+  return true
+})
 
 export type IAppManifest = typeof tAppManifest.infer
 

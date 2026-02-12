@@ -15,6 +15,21 @@
           />
           <div class="px-4">
             <b v-if="permission.required" class="text-red pr-1" v-text="t('msg.required')" />
+            <b
+              v-if="(redirectPermissionSet.has(permission.perm) || redirectOptionalPermissionSet.has(permission.perm)) && previouslyGrantedSet.has(permission.perm)"
+              class="text-green pr-1"
+              v-text="t('msg.perm-granted-and-used')"
+            />
+            <b
+              v-else-if="redirectPermissionSet.has(permission.perm) && !previouslyGrantedSet.has(permission.perm)"
+              class="text-orange pr-1"
+              v-text="t('msg.perm-auto-granted')"
+            />
+            <b
+              v-else-if="redirectOptionalPermissionSet.has(permission.perm) && !previouslyGrantedSet.has(permission.perm)"
+              class="text-blue pr-1"
+              v-text="t('msg.perm-optional-requested')"
+            />
             <span class="pr-1" v-text="t('msg.will-grant-permission-for')" />
             <b v-text="permission.reason" />
           </div>
@@ -54,16 +69,23 @@
 <script setup lang="ts">
 import type { IAppDoc } from '@uaaa/server'
 
-const { app, readonly, fillRequired } = defineProps<{
-  app: Pick<IAppDoc, '_id' | 'requestedClaims' | 'requestedPermissions' | 'icon' | 'name'>
-  readonly?: boolean
-  fillRequired?: boolean
-}>()
+const { app, readonly, fillRequired, redirectPermissions, redirectOptionalPermissions } =
+  defineProps<{
+    app: Pick<IAppDoc, '_id' | 'requestedClaims' | 'requestedPermissions' | 'icon' | 'name'>
+    readonly?: boolean
+    fillRequired?: boolean
+    redirectPermissions?: string[]
+    redirectOptionalPermissions?: string[]
+  }>()
 const { t } = useI18n()
 
 const permissions = defineModel<Record<string, boolean>>('permissions', { default: {} })
 const claims = defineModel<Record<string, boolean>>('claims', { default: {} })
 const { toVerify } = useRedirect()
+
+const redirectPermissionSet = computed(() => new Set(redirectPermissions ?? []))
+const redirectOptionalPermissionSet = computed(() => new Set(redirectOptionalPermissions ?? []))
+const previouslyGrantedSet = ref(new Set<string>())
 
 const { data: installation, pending } = useAsyncData(
   () => `app-grants-${app._id}`,
@@ -89,23 +111,48 @@ const { data: installation, pending } = useAsyncData(
 watch(
   installation,
   (installation) => {
+    const perms: Record<string, boolean> = {}
+    const cls: Record<string, boolean> = {}
     if (installation) {
-      permissions.value = Object.fromEntries(installation.grantedPermissions.map((p) => [p, true]))
-      claims.value = Object.fromEntries(installation.grantedClaims.map((c) => [c, true]))
+      for (const p of installation.grantedPermissions) perms[p] = true
+      for (const c of installation.grantedClaims) cls[c] = true
+      previouslyGrantedSet.value = new Set(installation.grantedPermissions)
     }
     if (fillRequired) {
       for (const permission of app.requestedPermissions) {
-        if (permission.required) {
-          permissions.value[permission.perm] = true
-        }
+        if (permission.required) perms[permission.perm] = true
       }
       for (const claim of app.requestedClaims) {
-        if (claim.required) {
-          claims.value[claim.name] = true
-        }
+        if (claim.required) cls[claim.name] = true
       }
     }
+    if (redirectPermissions?.length) {
+      const requestedPermSet = new Set(app.requestedPermissions.map((p) => p.perm))
+      for (const perm of redirectPermissions) {
+        if (requestedPermSet.has(perm)) perms[perm] = true
+      }
+    }
+    permissions.value = perms
+    claims.value = cls
   },
   { immediate: true }
 )
+
+function autoEnableRedirectPermissions() {
+  if (!redirectPermissions?.length) return
+  const requestedPermSet = new Set(app.requestedPermissions.map((p) => p.perm))
+  const updated = { ...permissions.value }
+  let changed = false
+  for (const perm of redirectPermissions) {
+    if (requestedPermSet.has(perm) && !updated[perm]) {
+      updated[perm] = true
+      changed = true
+    }
+  }
+  if (changed) {
+    permissions.value = updated
+  }
+}
+
+watch(() => redirectPermissions, autoEnableRedirectPermissions)
 </script>
