@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+import { SECURITY_LEVEL } from '@uaaa/core'
 import { Builtins, Cli, Command, Option } from 'clipanion'
+import bcrypt from 'bcrypt'
 import type { Document } from 'mongodb'
 import { nanoid } from 'nanoid'
 import { readFile } from 'node:fs/promises'
@@ -311,6 +313,53 @@ class RegisterUserCommand extends BaseCommand {
   }
 }
 
+class SetPasswordCommand extends BaseCommand {
+  static paths = [['set-password'], ['sp']]
+  static usage = Command.Usage({})
+
+  userId = Option.String('-u,--user', { required: true })
+  password = Option.String('-p,--password', { required: true })
+
+  async execute() {
+    const app = await this.getApp()
+    const user = await app.db.users.findOne({ _id: this.userId })
+    if (!user) throw new Error(`User ${this.userId} not found`)
+
+    const hashed = await bcrypt.hash(this.password, 10)
+    const now = Date.now()
+
+    const { upsertedCount, modifiedCount } = await app.db.credentials.updateOne(
+      { userId: this.userId, type: 'password' as const },
+      {
+        $setOnInsert: {
+          _id: nanoid(),
+          createdAt: now
+        },
+        $set: {
+          userIdentifier: '',
+          data: '',
+          secret: hashed,
+          remark: '',
+          securityLevel: SECURITY_LEVEL.MEDIUM,
+          validAfter: now,
+          validBefore: now + 100 * 365 * 24 * 60 * 60 * 1000,
+          validCount: Number.MAX_SAFE_INTEGER,
+          updatedAt: now
+        },
+        $unset: { disabled: '' as never }
+      },
+      { upsert: true }
+    )
+
+    if (upsertedCount) {
+      console.log(`Password credential created for user ${this.userId}`)
+    } else if (modifiedCount) {
+      console.log(`Password credential updated for user ${this.userId}`)
+    }
+    await app.stop()
+  }
+}
+
 const [node, app, ...args] = process.argv
 
 const cli = new Cli({
@@ -324,6 +373,7 @@ cli.register(UpdateUserCommand)
 cli.register(FindCredentialCommand)
 cli.register(UpdateCredentialCommand)
 cli.register(RegisterUserCommand)
+cli.register(SetPasswordCommand)
 cli.register(Builtins.HelpCommand)
 cli.register(Builtins.VersionCommand)
 cli.runExit(args)

@@ -12,6 +12,7 @@ import { definePlugin } from '../../_common.js'
 
 const tPasswordConfig = type({
   'passwordLogin?': '"enabled" | "hidden" | "disabled"',
+  'passwordBind?': '"enabled" | "disabled"',
   'passwordExpiration?': 'number|string',
   'passwordTimeout?': 'number|string'
 })
@@ -38,11 +39,13 @@ class PasswordImpl extends CredentialImpl {
   defaultLevel = SECURITY_LEVEL.MEDIUM
   passwordExpiration
   loginType
+  bindType
 
   constructor(config: IPasswordConfig) {
     super()
     this.passwordExpiration = this.parseTimeout(config.passwordExpiration ?? '100y')
     this.loginType = config.passwordLogin ?? 'enabled'
+    this.bindType = config.passwordBind ?? 'enabled'
   }
 
   private parseTimeout(timeout: number | string) {
@@ -102,6 +105,7 @@ class PasswordImpl extends CredentialImpl {
   }
 
   override async showBind(ctx: CredentialContext, userId: string) {
+    if (this.bindType === 'disabled') return null
     const credential = await ctx.app.db.credentials.findOne({
       userId,
       type: 'password'
@@ -146,6 +150,9 @@ class PasswordImpl extends CredentialImpl {
     credentialId: string | undefined,
     _payload: unknown
   ) {
+    if (this.bindType === 'disabled') {
+      throw new BusinessError('FORBIDDEN', { msg: 'Password bind is disabled' })
+    }
     const payload = PasswordImpl.tPasswordVerifyPayload(_payload)
     if (payload instanceof type.errors) {
       throw new BusinessError('INVALID_TYPE', { summary: payload.summary })
