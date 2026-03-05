@@ -7,6 +7,17 @@ import { en, zhHans } from 'vuetify/locale'
 export default defineNuxtPlugin((app) => {
   const vuetify = createVuetify({
     blueprint: md3,
+    theme: {
+      defaultTheme: 'light'
+    },
+    display: {
+      thresholds: {
+        md: 960,
+        lg: 1280,
+        xl: 1920,
+        xxl: 2560
+      }
+    },
     locale: {
       fallback: 'zh-Hans',
       messages: { en, 'zh-Hans': zhHans }

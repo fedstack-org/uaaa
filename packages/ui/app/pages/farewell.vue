@@ -1,7 +1,7 @@
 <template>
   <VContainer
     ref="container"
-    class="fill-height justify-center"
+    class="fill-height d-flex align-center flex-wrap justify-center"
     :class="{ 'opacity-0': !isVisible }"
     :style="{ transition: 'opacity 500ms ease-in-out' }"
   >
@@ -11,7 +11,7 @@
           <CommonLogo variant="flat" />
         </VIcon>
         <div>{{ t('pages.farewell') }}</div>
-        <div v-if="app" class="text-caption">{{ app.name }}</div>
+        <div v-if="app" class="text-body-small">{{ app.name }}</div>
       </VCardTitle>
       <VDivider />
       <VCardText class="text-center">

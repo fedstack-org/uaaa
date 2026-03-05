@@ -1,5 +1,5 @@
 <template>
-  <VContainer class="fill-height justify-center">
+  <VContainer class="fill-height d-flex align-center flex-wrap justify-center">
     <VCard class="min-w-xs lg:min-w-md">
       <VCardTitle class="d-flex flex-col items-center">
         <VIcon size="128">
@@ -7,13 +7,13 @@
         </VIcon>
         <div class="text-center">
           <div>{{ t('pages.authorize') }}</div>
-          <div v-if="data" class="text-caption">{{ data.name }}</div>
+          <div v-if="data" class="text-body-small">{{ data.name }}</div>
         </div>
       </VCardTitle>
       <VDivider />
       <div class="d-flex items-center">
         <div class="flex-1" />
-        <div class="text-subtitle-2 text-center">{{ t('msg.current-user') }}</div>
+        <div class="text-label-large text-center">{{ t('msg.current-user') }}</div>
         <div class="flex-1 text-right">
           <VBtn
             color="primary"

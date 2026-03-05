@@ -4491,9 +4491,8 @@ __metadata:
     uqr: "npm:^0.1.2"
     vite-plugin-vuetify: "npm:^2.1.3"
     vue: "npm:^3.5.29"
-    vue-toastification: "npm:^2.0.0-rc.5"
     vue-tsc: "npm:^3.2.5"
-    vuetify: "npm:^3.11.0"
+    vuetify: "npm:^4.0.1"
     whatwg-url: "npm:^14.2.0"
   languageName: unknown
   linkType: soft
@@ -13594,15 +13593,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue-toastification@npm:^2.0.0-rc.5":
-  version: 2.0.0-rc.5
-  resolution: "vue-toastification@npm:2.0.0-rc.5"
-  peerDependencies:
-    vue: ^3.0.2
-  checksum: 10/da2698e8a24f3de99269d71327879c389236179225dca9112d1de971fcd2e809d83670e1195f3c59a232f8b53c5625b93d573e809da7cb587527b5d339ec9bdb
-  languageName: node
-  linkType: hard
-
 "vue-tsc@npm:^3.2.5":
   version: 3.2.5
   resolution: "vue-tsc@npm:3.2.5"
@@ -13635,9 +13625,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vuetify@npm:^3.11.0":
-  version: 3.12.2
-  resolution: "vuetify@npm:3.12.2"
+"vuetify@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "vuetify@npm:4.0.1"
   peerDependencies:
     typescript: ">=4.7"
     vite-plugin-vuetify: ">=2.1.0"
@@ -13650,7 +13640,7 @@ __metadata:
       optional: true
     webpack-plugin-vuetify:
       optional: true
-  checksum: 10/756c832c00209af8c2e20ce014bca8a7056f5042416e88029bd90de770da2643caf88c5387c513dd0f207af0a8783c875f4ca64f908c181981ca0e87536d394a
+  checksum: 10/e0ff1cfc19b8cd7f084f3e4da6bb04c0e498b39cb5b19e1df89b1d028dc79fa3e89c9ae42affa2825cf0ab74ce031a59d65c134820a251025b9442f29ac7551b
   languageName: node
   linkType: hard
 

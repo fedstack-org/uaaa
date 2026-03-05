@@ -1,6 +1,23 @@
-import { useToast } from 'vue-toastification'
+import type { SnackbarMessage } from 'vuetify/components'
 
-export { useToast }
+const messages = ref<SnackbarMessage[]>([])
+
+function push(msg: SnackbarMessage) {
+  messages.value.push(msg)
+}
+
+export function useToastMessages() {
+  return messages
+}
+
+export function useToast() {
+  return {
+    success: (text: string) => push({ text, color: 'success' }),
+    error: (text: string) => push({ text, color: 'error' }),
+    info: (text: string) => push({ text, color: 'info' }),
+    warning: (text: string) => push({ text, color: 'warning' })
+  }
+}
 
 export const useErrorToast = () => {
   const toast = useToast()

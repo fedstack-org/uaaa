@@ -20,7 +20,7 @@
           </div>
           <div class="text-center">
             <div>{{ t('pages.auth.signin') }}</div>
-            <div v-if="data?.app" class="text-caption">{{ data.app.name }}</div>
+            <div v-if="data?.app" class="text-body-small">{{ data.app.name }}</div>
           </div>
           <div class="flex-1 flex justify-end">
             <VBtn
@@ -40,7 +40,7 @@
       <!-- Candidate Accounts Section -->
       <VFadeTransition mode="out-in">
         <div v-if="hasCandidates && !type && !isRemote">
-          <div class="text-subtitle-2 text-center mt-2">
+          <div class="text-label-large text-center mt-2">
             {{ t('msg.previously-logged-accounts') }}
           </div>
           <VList mandatory color="primary" density="compact" class="mx-4 pt-0">
@@ -55,7 +55,7 @@
             />
           </VList>
           <VDivider />
-          <div class="text-subtitle-2 text-center mt-2">
+          <div class="text-label-large text-center mt-2">
             {{ t('msg.login-other-account') }}
           </div>
         </div>

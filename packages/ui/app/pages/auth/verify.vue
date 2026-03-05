@@ -19,7 +19,7 @@
           </div>
           <div class="text-center">
             <div>{{ t('pages.auth.verify') }}</div>
-            <div v-if="data?.app" class="text-caption">{{ data.app.name }}</div>
+            <div v-if="data?.app" class="text-body-small">{{ data.app.name }}</div>
           </div>
           <div class="flex-1 flex justify-start" />
         </div>
@@ -27,7 +27,7 @@
       <VDivider />
       <div class="d-flex items-center">
         <div class="flex-1" />
-        <div class="text-subtitle-2 text-center">{{ t('msg.current-user') }}</div>
+        <div class="text-label-large text-center">{{ t('msg.current-user') }}</div>
         <div class="flex-1 text-right">
           <VBtn
             v-if="data?.app"

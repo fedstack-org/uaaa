@@ -10,7 +10,7 @@
           <VImg v-if="data.icon" :src="data.icon" />
           <span
             v-else
-            class="text-h5"
+            class="text-headline-small"
             :style="{ color: contrastingColor(stringToColor(appId)) }"
             v-text="generateTitle(data.name)"
           />

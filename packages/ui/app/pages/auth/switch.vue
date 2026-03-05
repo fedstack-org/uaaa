@@ -20,7 +20,7 @@
         <VCardText class="flex flex-col gap-2">
           <!-- Current user info -->
           <template v-if="isLoggedIn">
-            <div class="text-subtitle-2 text-center">{{ t('msg.current-user') }}</div>
+            <div class="text-label-large text-center">{{ t('msg.current-user') }}</div>
             <VList mandatory color="info">
               <UserListItem
                 active
@@ -33,7 +33,7 @@
 
           <!-- Candidate accounts -->
           <template v-if="hasCandidates">
-            <div class="text-subtitle-2 text-center mb-2">{{ t('msg.other-users') }}</div>
+            <div class="text-label-large text-center mb-2">{{ t('msg.other-users') }}</div>
             <VList mandatory color="primary">
               <UserListItem
                 v-for="{ sub, claims } in candidateAccounts"

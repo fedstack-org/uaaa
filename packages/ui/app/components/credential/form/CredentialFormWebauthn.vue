@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useToast } from 'vue-toastification'
+import { useToast } from '~/composables/useToast'
 import { startRegistration, startAuthentication } from '@simplewebauthn/browser'
 import type { SecurityLevel } from '~/utils/api'
 

@@ -34,7 +34,7 @@
       <VDivider />
       <div class="d-flex justify-between items-center">
         <div>
-          <div class="text-caption px-2">{{ author }}</div>
+          <div class="text-body-small px-2">{{ author }}</div>
         </div>
         <div>
           <VDialog v-if="showGrant" activator="parent" max-width="800">
