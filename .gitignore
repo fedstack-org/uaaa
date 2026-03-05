@@ -135,3 +135,6 @@ dist
 
 docs/.vitepress/dist
 docs/.vitepress/cache
+
+# No AI configuration
+.mcp.json
