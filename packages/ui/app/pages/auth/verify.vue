@@ -157,7 +157,7 @@ const { data, error } = await useAsyncData(
 
 const { status } = await useAsyncData(
   () =>
-    `verify-preauth-${config.value.preAuthType}-${btoa(JSON.stringify(config.value.preAuthPayload))}`,
+    `verify-preauth-${config.value.preAuthType}-${encodeURIComponent(JSON.stringify(config.value.preAuthPayload))}`,
   async () => {
     if (!config.value.preAuthType || !config.value.preAuthPayload)
       throw new Error('PreAuth Skipped')
