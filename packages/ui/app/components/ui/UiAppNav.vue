@@ -48,9 +48,10 @@ const links = [
 
 const adminLinks = [
   { title: 'pages.console.index', prependIcon: 'mdi-console' },
-  { to: '/console/user', title: 'pages.console.user' },
-  { to: '/console/app', title: 'pages.console.app' },
-  { to: '/console/system', title: 'pages.console.setting' }
+  { to: '/console', title: 'console.dashboard', prependIcon: 'mdi-view-dashboard-outline', exact: true },
+  { to: '/console/user', title: 'pages.console.user', prependIcon: 'mdi-account-group-outline' },
+  { to: '/console/app', title: 'pages.console.app', prependIcon: 'mdi-application-cog-outline' },
+  { to: '/console/system', title: 'pages.console.setting', prependIcon: 'mdi-cog-outline' }
 ]
 
 const { isAdmin } = api

@@ -20,6 +20,21 @@ export const pageQueryValidator = arktypeValidator(
   })
 )
 
+export const searchQueryValidator = arktypeValidator(
+  'query',
+  type({
+    skip: 'string.integer.parse',
+    limit: type('string.integer.parse').narrow((v) => 5 <= v && v <= 100),
+    'count?': type('string.integer.parse')
+      .narrow((v) => 0 <= v && v <= 1)
+      .pipe((v) => !!v),
+    'search?': 'string',
+    'disabled?': type('string')
+      .narrow((v) => v === '0' || v === '1')
+      .pipe((v) => v === '1')
+  })
+)
+
 declare module '../index.js' {
   interface IHookMap {
     'route:extendGlobal'(parent: Hono): void

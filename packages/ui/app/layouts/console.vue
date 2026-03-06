@@ -3,7 +3,7 @@
     <UiAppBar v-model="navOpen" console />
     <UiAppNav v-model="navOpen" />
     <VMain>
-      <VContainer>
+      <VContainer fluid>
         <slot />
       </VContainer>
     </VMain>

@@ -1,7 +1,5 @@
 <template>
-  <VContainer>
-    <NuxtPage />
-  </VContainer>
+  <NuxtPage />
 </template>
 
 <script setup lang="ts">

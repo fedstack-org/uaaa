@@ -2,7 +2,8 @@ export const usePagination = <T>(
   executor: (
     skip: number,
     limit: number,
-    count: boolean
+    count: boolean,
+    extra?: { search?: string; disabled?: string }
   ) => Promise<{
     items: T[]
     count: number
@@ -11,13 +12,18 @@ export const usePagination = <T>(
 ) => {
   const page = useRouteQuery('page', '1', { transform: Number })
   const perPage = useRouteQuery('perPage', '10', { transform: Number })
+  const search = ref('')
+  const filters = ref<Record<string, string>>({})
   const cachedCount = ref(0)
   let countLoaded = false
   const { data, error, execute, status } = useAsyncData(
     key ?? useId(),
     async () => {
       const skip = (page.value - 1) * perPage.value
-      const { items, count } = await executor(skip, perPage.value, !countLoaded)
+      const extra: { search?: string; disabled?: string } = {}
+      if (search.value) extra.search = search.value
+      if (filters.value.disabled) extra.disabled = filters.value.disabled
+      const { items, count } = await executor(skip, perPage.value, !countLoaded, extra)
       if (!countLoaded) {
         countLoaded = true
         cachedCount.value = count
@@ -28,9 +34,16 @@ export const usePagination = <T>(
       deep: true
     }
   )
-  watch([page, perPage], (cur, old) => {
-    console.log(cur, old)
+  watch([page, perPage], () => {
     execute()
   })
-  return { page, perPage, data, error, cachedCount, execute, status }
+
+  const debouncedSearch = refDebounced(search, 300)
+  watch([debouncedSearch, filters], () => {
+    countLoaded = false
+    page.value = 1
+    execute()
+  }, { deep: true })
+
+  return { page, perPage, search, filters, data, error, cachedCount, execute, status }
 }

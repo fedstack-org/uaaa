@@ -1,9 +1,5 @@
 <template>
-  <VRow>
-    <VCol>
-      <ConsoleAppListCard />
-    </VCol>
-  </VRow>
+  <ConsoleAppListCard />
 </template>
 
 <script setup lang="ts">

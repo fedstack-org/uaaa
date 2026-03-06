@@ -58,6 +58,11 @@ actions:
   logout: 登出
   switch-account: 切换账号
   close: 关闭
+  delete: 删除
+  enable: 启用
+  disable: 禁用
+  create: 新建
+  search: 搜索
 
 msg:
   id: ID
@@ -197,6 +202,46 @@ securityLevel:
 console:
   app-list: 应用列表
   add-app: 添加应用
+  dashboard: 仪表盘
+  user-count: 用户数
+  app-count: 应用数
+  active-sessions: 活跃会话
+  active-tokens: 活跃令牌
+  quick-links: 快捷入口
+  user-detail: 用户详情
+  user-info: 用户信息
+  user-credentials: 用户凭据
+  user-sessions: 用户会话
+  user-installations: 已安装应用
+  confirm-enable-user: 确认启用该用户？
+  confirm-disable-user: 确认禁用该用户？禁用后所有会话和令牌将被终止。
+  confirm-enable-app: 确认启用该应用？
+  confirm-disable-app: 确认禁用该应用？禁用后该应用所有令牌将被终止。
+  confirm-reset-secret: 确认重置应用密钥？旧密钥将立即失效。
+  secret-copied: 新密钥已复制到剪贴板
+  system-readonly-warning: 系统配置为只读。修改系统配置可能导致不可恢复的错误，请在获得授权的情况下直接在服务器上修改。
+  edit-claim-title: 编辑用户信息
+  claim-name: 信息名称
+  claim-value: 信息值
+  config-key: 配置键
+  config-value: 配置值（JSON）
+  no-credentials: 暂无凭据
+  no-sessions: 暂无会话
+  no-installations: 暂无已安装应用
+  credential-type: 凭据类型
+  credential-remark: 备注
+  credential-security-level: 安全等级
+  installation-app: 应用
+  installation-version: 版本
+  granted-permissions: 已授权权限
+  granted-claims: 已授权信息
+  view-detail: 查看详情
+  reset-secret: 重置密钥
+  filter-status: 状态筛选
+  all: 全部
+  enabled-only: 仅启用
+  disabled-only: 仅禁用
+  confirm-delete: 确认删除应用？所有用户安装将被删除。
 
 errors:
   api:

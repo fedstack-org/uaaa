@@ -58,6 +58,11 @@ actions:
   logout: Sign Out
   switch-account: Switch Account
   close: Close
+  delete: Delete
+  enable: Enable
+  disable: Disable
+  create: Create
+  search: Search
 
 msg:
   id: ID
@@ -203,6 +208,46 @@ securityLevel:
 console:
   app-list: Application List
   add-app: Add Application
+  dashboard: Dashboard
+  user-count: Users
+  app-count: Applications
+  active-sessions: Active Sessions
+  active-tokens: Active Tokens
+  quick-links: Quick Links
+  user-detail: User Detail
+  user-info: User Info
+  user-credentials: Credentials
+  user-sessions: Sessions
+  user-installations: Installed Apps
+  confirm-enable-user: Confirm enabling this user?
+  confirm-disable-user: Confirm disabling this user? All sessions and tokens will be terminated.
+  confirm-enable-app: Confirm enabling this application?
+  confirm-disable-app: Confirm disabling this application? All tokens will be terminated.
+  confirm-reset-secret: Confirm resetting app secret? The old secret will be invalidated immediately.
+  secret-copied: New secret copied to clipboard
+  system-readonly-warning: System configuration is read-only. Modifying system configuration may cause unrecoverable errors. Please modify directly on the server with proper authorization.
+  edit-claim-title: Edit User Claim
+  claim-name: Claim Name
+  claim-value: Claim Value
+  config-key: Config Key
+  config-value: Config Value (JSON)
+  no-credentials: No credentials
+  no-sessions: No sessions
+  no-installations: No installed apps
+  credential-type: Type
+  credential-remark: Remark
+  credential-security-level: Security Level
+  installation-app: Application
+  installation-version: Version
+  granted-permissions: Granted Permissions
+  granted-claims: Granted Claims
+  view-detail: View Detail
+  reset-secret: Reset Secret
+  filter-status: Status Filter
+  all: All
+  enabled-only: Enabled Only
+  disabled-only: Disabled Only
+  confirm-delete: Confirm deleting this application? All installations will be removed.
 
 errors:
   api:
