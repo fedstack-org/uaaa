@@ -33,7 +33,11 @@
 
       <VDivider class="my-4" />
 
-      <VSwitch v-model="dcrEnabled" label="Enable DCR (Dynamic Client Registration)" color="primary" />
+      <VSwitch
+        v-model="dcrEnabled"
+        label="Enable DCR (Dynamic Client Registration)"
+        color="primary"
+      />
       <div v-if="dcrEnabled && manifest.dcr">
         <CommonListEditor
           v-model="manifest.dcr.softwareIds"

@@ -16,17 +16,27 @@
           <div class="px-4">
             <b v-if="permission.required" class="text-red pr-1" v-text="t('msg.required')" />
             <b
-              v-if="(redirectPermissionSet.has(permission.perm) || redirectOptionalPermissionSet.has(permission.perm)) && previouslyGrantedSet.has(permission.perm)"
+              v-if="
+                (redirectPermissionSet.has(permission.perm) ||
+                  redirectOptionalPermissionSet.has(permission.perm)) &&
+                previouslyGrantedSet.has(permission.perm)
+              "
               class="text-green pr-1"
               v-text="t('msg.perm-granted-and-used')"
             />
             <b
-              v-else-if="redirectPermissionSet.has(permission.perm) && !previouslyGrantedSet.has(permission.perm)"
+              v-else-if="
+                redirectPermissionSet.has(permission.perm) &&
+                !previouslyGrantedSet.has(permission.perm)
+              "
               class="text-orange pr-1"
               v-text="t('msg.perm-auto-granted')"
             />
             <b
-              v-else-if="redirectOptionalPermissionSet.has(permission.perm) && !previouslyGrantedSet.has(permission.perm)"
+              v-else-if="
+                redirectOptionalPermissionSet.has(permission.perm) &&
+                !previouslyGrantedSet.has(permission.perm)
+              "
               class="text-blue pr-1"
               v-text="t('msg.perm-optional-requested')"
             />
@@ -69,22 +79,27 @@
 <script setup lang="ts">
 import type { IAppDoc } from '@uaaa/server'
 
-const { app, readonly, fillRequired, redirectPermissions, redirectOptionalPermissions } =
-  defineProps<{
-    app: Pick<IAppDoc, '_id' | 'requestedClaims' | 'requestedPermissions' | 'icon' | 'name'>
-    readonly?: boolean
-    fillRequired?: boolean
-    redirectPermissions?: string[]
-    redirectOptionalPermissions?: string[]
-  }>()
+const {
+  app,
+  readonly,
+  fillRequired,
+  redirectPermissions = [],
+  redirectOptionalPermissions = []
+} = defineProps<{
+  app: Pick<IAppDoc, '_id' | 'requestedClaims' | 'requestedPermissions' | 'icon' | 'name'>
+  readonly?: boolean
+  fillRequired?: boolean
+  redirectPermissions?: string[]
+  redirectOptionalPermissions?: string[]
+}>()
 const { t } = useI18n()
 
 const permissions = defineModel<Record<string, boolean>>('permissions', { default: {} })
 const claims = defineModel<Record<string, boolean>>('claims', { default: {} })
 const { toVerify } = useRedirect()
 
-const redirectPermissionSet = computed(() => new Set(redirectPermissions ?? []))
-const redirectOptionalPermissionSet = computed(() => new Set(redirectOptionalPermissions ?? []))
+const redirectPermissionSet = computed(() => new Set(redirectPermissions))
+const redirectOptionalPermissionSet = computed(() => new Set(redirectOptionalPermissions))
 const previouslyGrantedSet = ref(new Set<string>())
 
 const { data: installation, pending } = useAsyncData(
