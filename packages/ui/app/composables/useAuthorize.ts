@@ -24,6 +24,85 @@ abstract class Connector {
   abstract onCancel(params: IAuthorizeParams, app: IAppDTO): Promise<void>
 }
 
+class CASConnector extends Connector {
+  private _extractParams(params: IAuthorizeParams) {
+    const service = params.params?.service as string
+    if (!service) throw new Error('Missing service parameter')
+    return { service }
+  }
+
+  override async preAuthorize(params: IAuthorizeParams, app: IAppDoc): Promise<void> {
+    const { service } = this._extractParams(params)
+    // Validate service URL - could add service URL validation here
+    try {
+      new URL(service)
+    } catch {
+      throw new Error('Invalid service URL')
+    }
+  }
+
+  override async onAuthorize(
+    params: IAuthorizeParams,
+    app: IAppDoc,
+    beforeRedirect?: () => void
+  ): Promise<void> {
+    const { service } = this._extractParams(params)
+    
+    // Generate CAS service ticket
+    const resp = await api.session.cas_ticket.$post({
+      json: {
+        service,
+        appId: params.appId
+      }
+    })
+    await api.checkResponse(resp)
+    const data = await resp.json()
+    
+    if (!('ticket' in data)) {
+      throw new Error('Invalid response')
+    }
+
+    if (params.userCode) {
+      // Handle remote authorization for CAS
+      const resp = await api.session.remote_authorize.$post({
+        json: {
+          userCode: params.userCode,
+          response: {
+            ticket: data.ticket
+          }
+        }
+      })
+      await api.checkResponse(resp)
+    } else {
+      // Redirect to service with ticket
+      const serviceUrl = new URL(service)
+      serviceUrl.searchParams.set('ticket', data.ticket as string)
+      beforeRedirect?.()
+      await sleep(200)
+      location.href = serviceUrl.toString()
+    }
+  }
+
+  override async onRemoteAuthorize(
+    params: IAuthorizeParams,
+    response: Record<string, unknown>
+  ): Promise<void> {
+    const { service } = this._extractParams(params)
+    if (!('ticket' in response) || typeof response.ticket !== 'string') {
+      throw new Error('Invalid response')
+    }
+    const serviceUrl = new URL(service)
+    serviceUrl.searchParams.set('ticket', response.ticket)
+    location.href = serviceUrl.toString()
+  }
+
+  override async onCancel(params: IAuthorizeParams, app: IAppDoc): Promise<void> {
+    const { service } = this._extractParams(params)
+    // For CAS, we just redirect back to service without ticket
+    location.href = service
+  }
+}
+
 class OpenIDConnector extends Connector {
   private _extractParams(params: IAuthorizeParams) {
     const response_type = params.params?.response_type as string
@@ -120,7 +199,8 @@ class OpenIDConnector extends Connector {
 }
 
 const connectors = {
-  oidc: new OpenIDConnector()
+  oidc: new OpenIDConnector(),
+  cas: new CASConnector()
 } satisfies Record<string, Connector>
 
 type ConnectorType = keyof typeof connectors
